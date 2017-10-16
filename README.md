@@ -1,4 +1,4 @@
-# MOTH - Fake SMMT Service
+# Fake SMMT Service
 Fake SMMT service written in Node.js and deployed as a lambda function on AWS.
 
 Assigned JIRA: BL-6132
@@ -67,12 +67,6 @@ npm install gulp-cli -g
 ### Provided npm commands
 * npm start -> It will start web app on localhost:3000 using debug api key
 * npm test -> It will execute unit, integration tests and unit tests code coverage check.
-* npm run prod -> Remove dev dependencies and install production dependencies if needed
-
-### Provided Gulp commands
-* gulp -> Execute tests, linter and retire lib check (without watchers)
-* npm start
-* npm test 
 * npm run prod -> Remove dev dependencies and install production dependencies if needed
 
 ### Provided Gulp commands
