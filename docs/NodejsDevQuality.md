@@ -1,6 +1,5 @@
 # Software Development Quality Assurance Policy
 
-##
 ### JavaScript code style
 ##
 Code must be written according to [JavaScript Style Guide](https://github.com/airbnb/javascript)
