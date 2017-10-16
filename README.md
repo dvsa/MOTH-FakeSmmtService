@@ -66,7 +66,7 @@ npm install gulp-cli -g
 
 ##
 ### Provided npm commands
-* npm start -> It will start web app on localhost:3000 using debug api key
+* npm start -> It will start web app on localhost:3000 using debug api key and any change will reload server (thx to [nodemon](https://github.com/remy/nodemon))
 * npm test -> It will execute unit, integration tests and unit tests code coverage check.
 * npm run prod -> Remove dev dependencies and install production dependencies if needed
 
