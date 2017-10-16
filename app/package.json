@@ -4,7 +4,7 @@
   "description": "Fake SMMT service used during MOT Recalls feature development and testing.",
   "main": "lambda.js",
   "scripts": {
-    "start": "node src/localSmmtService.js",
+    "start": "nodemon src/localSmmtService.js",
     "test": "nyc mocha --exit",
     "prod": "npm prune --production; npm install --production",
     "report": "nyc report --reporter=html"
@@ -34,6 +34,7 @@
     "gulp-mocha": "^4.3.1",
     "gulp-util": "^3.0.8",
     "mocha": "^4.0.1",
+    "nodemon": "^1.12.1",
     "nyc": "^11.2.1",
     "retire": "^1.4.0"
   },
