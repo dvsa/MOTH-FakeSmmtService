@@ -12,9 +12,6 @@
   "author": "Marcin Duszynski",
   "url": "https://github.com/Marcin-Duszynski/MOTH-FakeSmmtService",
   "license": "MIT",
-  "author": "Marcin Duszynski",
-  "url": "https://github.com/Marcin-Duszynski/MOTH-FakeSmmtService",
-  "license": "ISC",
   "repository": {
     "type": "git",
     "url": "https://github.com/Marcin-Duszynski/MOTH-FakeSmmtService.git"
@@ -44,7 +41,7 @@
     "check-coverage": true,
     "per-file": true,
     "lines": 90,
-    "statements":90,
+    "statements": 90,
     "functions": 90,
     "branches": 90,
     "include": [
