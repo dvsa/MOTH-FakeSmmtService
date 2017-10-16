@@ -6,7 +6,6 @@ Assigned JIRA: BL-6132
 # [Software Development Quality Assurance Policy](docs/NodejsDevQuality.md)
 
 # Documentation
-##
 ### Supported SMMT endpoints
 
 * Endpoint used to verify if vehicle has outstanding recall
