@@ -1,20 +1,25 @@
 {
   "name": "FakeSmmtService",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Fake SMMT service used during MOT Recalls feature development and testing.",
-  "main": "lambda.js",
+  "main": "src/smmtService.js",
   "scripts": {
-    "start": "node src/localSmmtService.js",
+    "start": "nodemon src/localSmmtService.js",
     "test": "nyc mocha --exit",
+    "test:watch": "nodemon --exec \"npm run test\"",
+    "retire": "retire -n -p",
+    "lint": "eslint .",
+    "lint:watch": "nodemon --exec \"npm run lint\"",
     "prod": "npm prune --production; npm install --production",
-    "report": "nyc report --reporter=html"
+    "report": "nyc report --reporter=html",
+    "build": "mkdir ./dist; pack-zip ./ ./dist/fakeSmmtService.zip"
   },
   "author": "Marcin Duszynski",
-  "url": "https://github.com/Marcin-Duszynski/MOTH-FakeSmmtService",
+  "url": "https://github.com/dvsa/vehicle-recalls-fake-smmt-service",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Marcin-Duszynski/MOTH-FakeSmmtService.git"
+    "url": "https://github.com/dvsa/vehicle-recalls-fake-smmt-service.git"
   },
   "dependencies": {
     "body-parser": "^1.18.2",
@@ -29,12 +34,10 @@
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^6.0.2",
     "eslint-plugin-react": "^7.4.0",
-    "gulp": "^3.9.1",
-    "gulp-eslint": "^4.0.0",
-    "gulp-mocha": "^4.3.1",
-    "gulp-util": "^3.0.8",
     "mocha": "^4.0.1",
+    "nodemon": "^1.12.1",
     "nyc": "^11.2.1",
+    "pack-zip": "^0.2.2",
     "retire": "^1.4.0"
   },
   "nyc": {
