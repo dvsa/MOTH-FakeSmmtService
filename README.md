@@ -53,28 +53,14 @@ brew cask visual-studio-code
 ```
 npm install
 ```
-* Start gulp watchers in Visual Studio Code terminals
+* Start npm watchers in Visual Studio Code terminals
 ```
-gulp test:watch
-gulp lint:watch
-gulp retire:watch
-```
-Gulp cli is required!!!
-```
-npm install gulp-cli -g
+npm run test:watch
+npm run lint:watch
 ```
 
 ##
 ### Provided npm commands
-* npm start -> It will start web app on localhost:3000 using debug api key
+* npm start -> It will start web app on localhost:3000 using debug api key and any change will reload server (thx to [nodemon](https://github.com/remy/nodemon))
 * npm test -> It will execute unit, integration tests and unit tests code coverage check.
 * npm run prod -> Remove dev dependencies and install production dependencies if needed
-
-### Provided Gulp commands
-* gulp -> Execute once tests, linter and retire lib check
-* gulp test
-* gulp lint
-* gulp retire
-* gulp test:watch
-* gulp lint:watch
-* gulp retire:watch

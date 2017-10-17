@@ -37,5 +37,5 @@ It will verify if used libraries contain known vulnerabilities.
 
 To verify libraries use command:
 ```
-gulp retire
+npm run retire
 ```
