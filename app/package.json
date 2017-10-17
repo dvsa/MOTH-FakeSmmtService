@@ -1,8 +1,8 @@
 {
   "name": "FakeSmmtService",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Fake SMMT service used during MOT Recalls feature development and testing.",
-  "main": "lambda.js",
+  "main": "src/smmtService.js",
   "scripts": {
     "start": "nodemon src/localSmmtService.js",
     "test": "nyc mocha --exit",
@@ -15,11 +15,11 @@
     "build": "mkdir ./dist; pack-zip ./ ./dist/fakeSmmtService.zip"
   },
   "author": "Marcin Duszynski",
-  "url": "https://github.com/Marcin-Duszynski/MOTH-FakeSmmtService",
+  "url": "https://github.com/dvsa/vehicle-recalls-fake-smmt-service",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Marcin-Duszynski/MOTH-FakeSmmtService.git"
+    "url": "https://github.com/dvsa/vehicle-recalls-fake-smmt-service.git"
   },
   "dependencies": {
     "body-parser": "^1.18.2",
