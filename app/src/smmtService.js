@@ -2,11 +2,11 @@ const serverless = require('serverless-http');
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const apiKeyVerifier = require('./apiKeyVerifier');
-const vehicles = require('./vehicles');
-const fakeResponse = require('./fakeResponse');
-const path = require('./path');
-const bodyParametersFormatter = require('./bodyParametersFormatter');
+const apiKeyVerifier = require('./lib/apiKeyVerifier');
+const vehicles = require('./lib/vehicles');
+const fakeResponse = require('./lib/fakeResponse');
+const path = require('./lib/path');
+const bodyParametersFormatter = require('./lib/bodyParametersFormatter');
 
 const app = express();
 app.use(bodyParser.json());
