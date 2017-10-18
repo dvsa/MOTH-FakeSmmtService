@@ -1,7 +1,7 @@
 
-const configLoader = require('./configLoader');
-const path = require('./path');
-const fakeResponse = require('./fakeResponse');
+const configLoader = require('../config/configLoader');
+const path = require('../config/path');
+const fakeResponses = require('../fake/responses');
 
 const config = configLoader.load(process.env);
 
@@ -21,18 +21,18 @@ exports.middleware = (req, res, next) => {
   switch (reqPath) {
     case path.marquePath:
       check(req, next, () => {
-        res.status(200).send(fakeResponse.wrongApiKeyMarque);
+        res.status(200).send(fakeResponses.wrongApiKeyMarque);
       });
       break;
     case path.serviceAvailabilityPath:
       check(req, next, () => {
-        res.status(200).send(fakeResponse.wrongApiKeyServiceAvailability);
+        res.status(200).send(fakeResponses.wrongApiKeyServiceAvailability);
       });
       break;
     case path.vinCheckPath:
       check(req, next, () => {
         const { vin } = req.body;
-        res.status(200).send(fakeResponse.generateWrongApiKeyVinCheck(vin));
+        res.status(200).send(fakeResponses.generateWrongApiKeyVinCheck(vin));
       });
       break;
     default:

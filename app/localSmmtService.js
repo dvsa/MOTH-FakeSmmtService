@@ -1,4 +1,4 @@
-const smmt = require('./smmtService');
+const smmt = require('./src/smmtService');
 
 smmt.app.listen(3000, () => {
   console.info('Fake SMMT Service started in local mode on port 3000.');

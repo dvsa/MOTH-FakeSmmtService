@@ -4,7 +4,7 @@
   "description": "Fake SMMT service used during MOT Recalls feature development and testing.",
   "main": "src/smmtService.js",
   "scripts": {
-    "start": "nodemon src/localSmmtService.js",
+    "start": "nodemon localSmmtService.js",
     "test": "nyc mocha --exit",
     "test:watch": "nodemon --exec \"npm run test\"",
     "retire": "retire -n -p",
@@ -12,7 +12,7 @@
     "lint:watch": "nodemon --exec \"npm run lint\"",
     "prod": "npm prune --production; npm install --production",
     "report": "nyc report --reporter=html",
-    "build": "mkdir -p ./dist; pack-zip ./ ./dist/fakeSmmtService.zip"
+    "build": "mkdir -p ./dist; rm -f ./dist/test.zip; npm run prod; zip -r ./dist/test.zip node_modules/ src/"
   },
   "author": "Marcin Duszynski",
   "url": "https://github.com/dvsa/vehicle-recalls-fake-smmt-service",
@@ -37,7 +37,6 @@
     "mocha": "^4.0.1",
     "nodemon": "^1.12.1",
     "nyc": "^11.2.1",
-    "pack-zip": "^0.2.2",
     "retire": "^1.4.0"
   },
   "nyc": {

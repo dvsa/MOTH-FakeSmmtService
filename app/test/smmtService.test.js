@@ -1,6 +1,6 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const service = require('../src/localSmmtService');
+const service = require('../src/smmtService');
 
 chai.use(chaiHttp);
 chai.should();
