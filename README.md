@@ -68,4 +68,4 @@ npm run lint:watch
 * npm run lint -> It will trigger JavaScript code style check (esLint)
 * npm run lint:watch -> It will start file watcher and trigger esLint if any change is detected
 * npm run report -> Generate tests coverage report (check app/coverage/index.html for details)
-* npm run build -> Create release zip package in app/dist/ folder
+* BUILDSTAMP="BuildNumber" npm run build -> Create release zip package in app/dist/ folder
