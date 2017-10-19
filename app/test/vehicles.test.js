@@ -72,16 +72,4 @@ describe('When checking if vehicle has a outstanding recall', () => {
       recall.should.have.property('vin').eql(vin);
     });
   });
-  describe('and valid MARQUE and unknown VIN is provided', () => {
-    it('"No Recall Outstanding" message is provided.', () => {
-      const vin = 'asd123';
-      const marque = 'AUDI';
-
-      const recall = vehicles.getRecall(vin, marque);
-
-      recall.should.have.property('status').eql(200);
-      recall.should.have.property('status_description').eql('No Recall Outstanding');
-      recall.should.have.property('vin').eql(vin);
-    });
-  });
 });
