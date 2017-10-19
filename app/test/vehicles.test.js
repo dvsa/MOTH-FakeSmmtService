@@ -7,7 +7,7 @@ describe('When checking if vehicle has a outstanding recall', () => {
   describe('and valid VIN and MARQUE is provided', () => {
     it('and user provide upper case text and vehicle has a recall and "Recall Outstanding" message is provided.', () => {
       const vin = 'AISXXXTEST1239607';
-      const marque = 'BRUIN';
+      const marque = 'RENAULT';
 
       const recall = vehicles.getRecall(vin, marque);
 
@@ -18,7 +18,7 @@ describe('When checking if vehicle has a outstanding recall', () => {
 
     it('and user provide upper case text and vehicle has not a recall and "No Recall Outstanding" message is provided.', () => {
       const vin = 'AISXXXTEST1239617';
-      const marque = 'BRUIN';
+      const marque = 'AUDI';
 
       const recall = vehicles.getRecall(vin, marque);
 
@@ -29,7 +29,7 @@ describe('When checking if vehicle has a outstanding recall', () => {
 
     it('and user provide mixed case text and vehicle has a recall and "Recall Outstanding" message is provided.', () => {
       const vin = 'AISxxxTEst1239607';
-      const marque = 'BRuin';
+      const marque = 'RENauLT';
 
       const recall = vehicles.getRecall(vin, marque);
 
@@ -40,7 +40,7 @@ describe('When checking if vehicle has a outstanding recall', () => {
 
     it('and user provide mixed case text and vehicle has not a recall and "No Recall Outstanding" message is provided.', () => {
       const vin = 'AISxxxTEst1239617';
-      const marque = 'BRuin';
+      const marque = 'AUdi';
 
       const recall = vehicles.getRecall(vin, marque);
 
@@ -75,7 +75,7 @@ describe('When checking if vehicle has a outstanding recall', () => {
   describe('and valid MARQUE and unknown VIN is provided', () => {
     it('"No Recall Outstanding" message is provided.', () => {
       const vin = 'asd123';
-      const marque = 'BRUIN';
+      const marque = 'AUDI';
 
       const recall = vehicles.getRecall(vin, marque);
 
