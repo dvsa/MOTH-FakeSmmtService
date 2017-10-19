@@ -1,5 +1,5 @@
 const chai = require('chai');
-const configLoader = require('../src/configLoader');
+const configLoader = require('../src/config/configLoader');
 
 const should = chai.should();
 

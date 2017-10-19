@@ -1,5 +1,5 @@
 const chai = require('chai');
-const vehicles = require('../src/vehicles');
+const vehicles = require('../src/fake/vehicles');
 
 chai.should();
 

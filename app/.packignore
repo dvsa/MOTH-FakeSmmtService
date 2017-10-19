@@ -1,4 +1,5 @@
 test/**
+dist/**
 coverage/**
 serverless.yml
-dist/**
+src/localSmmtService.js

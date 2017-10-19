@@ -2,11 +2,11 @@ const serverless = require('serverless-http');
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const apiKeyVerifier = require('./apiKeyVerifier');
-const vehicles = require('./vehicles');
-const fakeResponse = require('./fakeResponse');
-const path = require('./path');
-const bodyParametersFormatter = require('./bodyParametersFormatter');
+const apiKeyVerifier = require('./middleware/apiKeyVerifier');
+const bodyParametersFormatter = require('./middleware/bodyParametersFormatter');
+const vehicles = require('./fake/vehicles');
+const fakeResponses = require('./fake/responses');
+const path = require('./config/path');
 
 const app = express();
 app.use(bodyParser.json());
@@ -15,11 +15,11 @@ app.use(apiKeyVerifier.middleware);
 app.disable('x-powered-by');
 
 app.post(path.serviceAvailabilityPath, (req, res) => {
-  res.status(200).send(fakeResponse.serviceAvailability);
+  res.status(200).send(fakeResponses.serviceAvailability);
 });
 
 app.post(path.marquePath, (req, res) => {
-  res.status(200).send(fakeResponse.marque);
+  res.status(200).send(fakeResponses.marque);
 });
 
 app.post(path.vinCheckPath, (req, res) => {
