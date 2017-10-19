@@ -24,7 +24,7 @@ POST /marque
 /serviceavailability
 ```
 
-Full fake SMMT api documentation with requests examples is located [on Postman page](https://documenter.getpostman.com/view/649866/fake-local-smmt/71B3Xsx)
+Full fake SMMT api documentation with requests examples is located [on Postman page](https://documenter.getpostman.com/view/649866/fake-local-smmt/71E2XGY)
 
 ##
 ### How to start
