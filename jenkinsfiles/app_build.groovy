@@ -1,8 +1,72 @@
+AWS_REGION = 'eu-west-1'
+TF_LOG_LEVEL = 'ERROR'
+ENV = 'int'
+TF_PROJECT = 'vehicle-recalls'
+BRANCH = params.BRANCH
+
 def sh_output(String script) {
   return sh(
     script: script,
     returnStdout: true
   ).trim()
+}
+
+def sh_status(String script) {
+  return sh(
+    script: script,
+    returnStatus: true
+  )
+}
+
+def log_info(String info) {
+  echo "[INFO] ${info}"
+}
+
+def bucket_exists(String bucket) {
+  return sh_status("aws s3 ls s3://${bucket} --region ${AWS_REGION} 2>&1 | grep -q -e \'NoSuchBucket\' -e \'AccessDenied\'")
+}
+
+def verify_or_create_bucket(String bucket, String tf_component) {
+  if (bucket_exists(bucket) == 1) {
+    log_info("Bucket ${bucket} found")
+  } else {
+    log_info("Bucket '${bucket}' not found.")
+    log_info("Creating Bucket")
+
+    node('ctrl' && 'dev') {
+      fetch_infrastructure_code()
+
+      extra_args = "--target module.${tf_component}.aws_s3_bucket.s3_bucket -var environment=${ENV}"
+      tf_scaffold('plan', tf_component, extra_args)
+      tf_scaffold('apply', tf_component, extra_args)
+    }
+  }
+}
+
+def build_and_upload_js(bucket) {
+  dir("app") {
+    sh("npm install run build")
+
+    dir("dist") {
+      sh("ls -lah")
+
+      def dist_files = sh_output("ls | wc -l").toInteger()
+      log_info("$dist_files files in dist")
+
+      if (dist_files == 0) {
+        abort_build("Dist file not found, aborting")
+      }
+
+      if (dist_files > 1) {
+        abort_build("More than one file in dist, aborting")
+      }
+
+      dist_file = sh_output("ls")
+      copy_file_to_s3(dist_file, bucket)
+    }
+  }
+
+  return dist_file
 }
 
 def abort_build(String message) {
@@ -14,161 +78,145 @@ def copy_file_to_s3(file, bucket) {
   sh("aws s3 cp $file s3://$bucket")
 }
 
-def checkout_github_repo(group, repo, branch) {
+def checkout_github_repo(String group, String repo, String branch) {
   checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: branch]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', depth: 0, noTags: true, reference: '', shallow: true], [$class: 'RelativeTargetDirectory', relativeTargetDir: repo]], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/' + group + '/' + repo + '.git']]]
 }
 
-def checkout_gitlab_repo(group, repo, branch, creds) {
+def checkout_github_repo_branch_or_master(group, repo, branch) {
+  try {
+    checkout_github_repo(group, repo, branch)
+  } catch(error) {
+    log_info("${error}")
+    checkout_github_repo(group, repo, "master")
+  }
+}
+
+def checkout_gitlab_repo(String group, String repo, String branch) {
+  log_info("Checkout GITLAB repo \"${group}/${repo}\" branch \"${branch}")
+
+  creds = '313a82d3-f2e7-4787-837e-7517f3ce84eb'
   checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: branch]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', depth: 0, noTags: true, reference: '', shallow: true], [$class: 'RelativeTargetDirectory', relativeTargetDir: repo]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: creds, url: 'git@gitlab.motdev.org.uk:' + group + '/' + repo + '.git']]]
 }
 
-def tf_scaffold(env_type, tf_log_level, action, project, environment, component, region, extra_args) {
+def checkout_gitlab_repo_branch_or_master(group, repo, branch) {
+  try {
+    checkout_gitlab_repo(group, repo, branch)
+  } catch(error) {
+    log_info("${error}")
+    checkout_gitlab_repo(group, repo, "master")
+  }
+}
+
+def tf_scaffold(action, component, extra_args) {
+  log_info("Terraform ${action} on \"${component}\" with \"${extra_args}\"")
+
+  env_type = 'FB'
+
   withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: env_type + '_AWS_CREDENTIALS', usernameVariable: 'aws_key_id', passwordVariable: 'aws_secret_key']]) {
     withEnv([
-      "AWS_DEFAULT_REGION=${aws_region}",
+      "AWS_DEFAULT_REGION=${AWS_REGION}",
       "AWS_ACCESS_KEY_ID=${env.aws_key_id}",
       "AWS_SECRET_ACCESS_KEY=${env.aws_secret_key}",
       'PATH+=/opt/tfenv/bin',
-      "TF_LOG=${tf_log_level}"
+      "TF_LOG=${TF_LOG_LEVEL}"
     ]) {
       sh """
-      export TFENV_DEBUG=1
+      export TFENV_DEBUG=0
       pwd
+      ls
       bash -x /var/lib/jenkins/workspace/Recalls/recalls-build/recalls-infrastructure/bin/terraform.sh \
         --action ${action} \
-        --project ${project} \
-        --environment ${environment} \
+        --project ${TF_PROJECT} \
+        --environment ${ENV} \
         --component ${component} \
-        --region ${region} \
+        --region ${AWS_REGION} \
         -- ${extra_args}
       """
-    } //withEnv
-  } //withCredentials
+    }
+  }
+}
+
+def fetch_infrastructure_code() {
+  checkout_gitlab_repo_branch_or_master('vehicle-recalls', 'recalls-terraform', "${BRANCH}")
+  sh("ls -lah")
+  checkout_gitlab_repo_branch_or_master('vehicle-recalls', 'recalls-infrastructure', "${BRANCH}")
+  sh("ls -lah")
 }
 
 def get_tfenv() {
   if (!fileExists('/opt/tfenv/bin/tfenv')) {
     dir('/opt') { check_out_github_repo('cartest', 'tfenv', 'master') }
   } else {
-    println '[INFO] TFENV already installed. Skipping...'
+    log_info('TFENV already installed. Skipping...')
   }
 }
 
-aws_region = 'eu-west-1'
-s3_deploy_bucket_prefix = 'uk.gov.dvsa.vehicle-recalls.'
-bucket_exists = 0
-//todo move to configuration of job?
-ENV = 'int'
-TF_LOG_LEVEL = 'WARN'
-TF_BRANCH = 'feature-BL-6181-pipeline'
+def build_and_deploy_lambda(params) {
+  String name = params.name
+  String bucket = params.bucket
+  String repo = params.repo
+  String tf_component = params.tf_component
+  String code_branch = params.code_branch
+  dist = ''
 
-s3_deploy_bucket = s3_deploy_bucket_prefix + ENV
+  stage('Verify S3 Bucket ' + name) {
+    verify_or_create_bucket(bucket, tf_component)
+  }
 
-fake_smmt_dist = ''
-vehicle_recalls_dist = ''
+  stage('Build ' + name) {
+    sh("rm -rf ${repo}")
+
+    checkout_github_repo_branch_or_master("dvsa", repo, code_branch)
+    dir(repo) {
+      dist = build_and_upload_js(bucket)
+    }
+  }
+
+  stage('TF Plan & Apply ' + name) {
+    node('ctrl' && 'dev') {
+      get_tfenv()
+      fetch_infrastructure_code()
+
+      def vars = "-var environment=${ENV} " +
+                 "-var lambda_s3_key=${dist}"
+
+      tf_scaffold('plan', tf_component, vars)
+      tf_scaffold('apply', tf_component, vars)
+    }
+  }
+}
 
 node('builder') {
   wrap([$class: 'BuildUser']) {
-    def user = env.BUILD_USER
+
     wrap([$class: 'TimestamperBuildWrapper']) {
       wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'FB_AWS_CREDENTIALS', usernameVariable: 'aws_key_id', passwordVariable: 'aws_secret_key']]) {
           withEnv([
-            "AWS_DEFAULT_REGION=${aws_region}",
+            "AWS_DEFAULT_REGION=${AWS_REGION}",
             "AWS_ACCESS_KEY_ID=${env.aws_key_id}",
             "AWS_SECRET_ACCESS_KEY=${env.aws_secret_key}",
             "BUILDSTAMP=${env.BUILD_NUMBER}"
           ]) {
-            stage('Verify S3 Bucket') {
-              bucket_exists = sh(
-                script: "aws s3 ls s3://${s3_deploy_bucket} --region ${aws_region} 2>&1 | grep -q -e 'NoSuchBucket' -e 'AccessDenied'",
-                returnStatus: true
-              )
-              if (bucket_exists == 0) {
-                echo "[INFO] Bucket '${s3_deploy_bucket}' not found."
-                echo "[INFO] Creating Bucket"
-                node('ctrl' && 'dev') {
-                  checkout_gitlab_repo('vehicle-recalls', 'recalls-infrastructure', "${TF_BRANCH}", '313a82d3-f2e7-4787-837e-7517f3ce84eb')
-                  get_tfenv()
 
-                  //create S3 Bucket for Lambda
-                  tf_scaffold('FB', "${TF_LOG_LEVEL}", 'plan', 'vehicle-recalls', "${ENV}", 'vehicle_recalls', "${aws_region}", "--target module.VehicleRecalls.aws_s3_bucket.vehicle_recalls  -var environment=${ENV}")
-                  tf_scaffold('FB', "${TF_LOG_LEVEL}", 'apply', 'vehicle-recalls', "${ENV}", 'vehicle_recalls', "${aws_region}", "--target module.VehicleRecalls.aws_s3_bucket.vehicle_recalls  -var environment=${ENV}")
-                }
-              } else {
-                echo "[INFO] Bucket '${s3_deploy_bucket}' found."
-              }
-            }
+            log_info("Building branch \"${BRANCH}\"")
 
-            stage('Build Fake SMMT') {
-              sh("rm -rf vehicle-recalls-fake-smmt-service")
-              checkout_github_repo("dvsa", "vehicle-recalls-fake-smmt-service", "master")
-              dir("vehicle-recalls-fake-smmt-service") {
-                dir("app") {
-                  sh("npm install")
-                  sh("npm run build")
+            build_and_deploy_lambda(
+              name: 'Fake SMMT',
+              bucket: 'uk.gov.dvsa.vehicle-recalls.fake_smmt.' + ENV,
+              repo: 'vehicle-recalls-fake-smmt-service',
+              tf_component: 'fake_smmt',
+              code_branch: BRANCH
+            )
 
-                  dir("dist") {
-                    sh("ls -lah")
-                    def dist_files = sh_output("ls | wc -l").toInteger()
-                    echo "$dist_files files in dist"
-                    if (dist_files > 1) {
-                      abort_build("More than one file in dist, aborting")
-                    }
 
-                    fake_smmt_dist = sh_output("ls")
-                    copy_file_to_s3(fake_smmt_dist, s3_deploy_bucket)
-                  }
-                }
-              }
-            }
-
-            stage('Build Vehicle Recalls API') {
-              //we don't have lambda yet so we are downloading fake again
-              checkout_github_repo("dvsa", "vehicle-recalls-fake-smmt-service", "master")
-              dir("vehicle-recalls-fake-smmt-service") {
-                dir("app") {
-                  sh("npm install")
-                  sh("npm run build")
-
-                  dir("dist") {
-                    sh("ls -lah")
-                    def dist_files = sh_output("ls | wc -l").toInteger()
-                    echo "$dist_files files in dist"
-                    if (dist_files > 1) {
-                      abort_build("More than one file in dist, aborting")
-                    }
-
-                    vehicle_recalls_dist = sh_output("ls")
-                    sh("mv $vehicle_recalls_dist vehicle-recalls-beta.zip")
-                    vehicle_recalls_dist = "vehicle-recalls-beta.zip"
-
-                    copy_file_to_s3(vehicle_recalls_dist, s3_deploy_bucket)
-                  }
-                }
-              }
-            }
-
-            stage('TF Plan & Apply') {
-              node('ctrl' && 'dev') {
-                get_tfenv()
-
-                checkout_gitlab_repo('vehicle-recalls', 'recalls-infrastructure', "${TF_BRANCH}", '313a82d3-f2e7-4787-837e-7517f3ce84eb')
-
-                  def vars = "-var environment=${ENV} " +
-                             "-var lambda_fake_smmt_s3_key=${fake_smmt_dist} " +
-                             "-var lambda_vehicle_recalls_api_s3_key=${vehicle_recalls_dist}"
-
-                  tf_scaffold('FB', "${TF_LOG_LEVEL}", 'plan', 'vehicle-recalls', "${ENV}", 'vehicle_recalls', "${aws_region}", vars)
-                  go_wait = 5
-                  //if ("${ENV}" != "int" && destroy == 'false') {
-                  echo "[INFO] You have ${go_wait} minutes to decide if you want to continue."
-                  timeout(go_wait) { input message: 'Are you happy with the plan?', ok: 'Yes!' }
-                  //}
-                  tf_scaffold('FB', "${TF_LOG_LEVEL}", 'apply', 'vehicle-recalls', "${ENV}", 'vehicle_recalls', "${aws_region}", vars)
-                  tf_scaffold('FB', "${TF_LOG_LEVEL}", 'output', 'vehicle-recalls', "${ENV}", 'vehicle_recalls', "${aws_region}", vars)
-              }
-            }
+            build_and_deploy_lambda(
+              name: 'Vehicle Recalls',
+              bucket: 'uk.gov.dvsa.vehicle-recalls.' + ENV,
+              repo: 'vehicle-recalls-api',
+              tf_component: 'vehicle_recalls_api',
+              code_branch: BRANCH
+            )
 
           }
         }
