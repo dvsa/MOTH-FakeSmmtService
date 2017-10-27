@@ -9,7 +9,7 @@ variable "environment" {
 
 variable "bucket_prefix" {
   type    = "string"
-  default = "uk.gov.dvsa.vehicle-recalls."
+  default = "uk.gov.dvsa.vehicle-recalls-test-new."
 }
 
 variable "bucket_versioning_enabled" {

@@ -5,3 +5,7 @@ module "s3" {
   bucket_prefix             = "${var.bucket_prefix}"                          # has default value
   bucket_versioning_enabled = "${var.bucket_versioning_enabled}"              # has default value
 }
+
+output "s3_location" {
+  value = "${module.s3.s3_location}"
+}

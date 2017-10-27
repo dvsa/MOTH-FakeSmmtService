@@ -16,3 +16,7 @@ variable "lambda_s3_key" {
   type    = "string"
   default = "default, when I am only creating bucket, I don't need it"
 }
+
+variable "lambda_s3_bucket" {
+  type    = "string"
+}

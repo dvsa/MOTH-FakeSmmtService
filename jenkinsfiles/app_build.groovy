@@ -22,30 +22,23 @@ def log_info(String info) {
   echo "[INFO] ${info}"
 }
 
-def bucket_exists(String bucket) {
-  return sh_status("aws s3 ls s3://${bucket} --region ${AWS_REGION} 2>&1 | grep -q -e \'NoSuchBucket\' -e \'AccessDenied\'")
-}
-
 def verify_or_create_bucket(String bucket, String tf_component) {
-  if (bucket_exists(bucket) == 1) {
-    log_info("Bucket ${bucket} found")
-  } else {
-    log_info("Bucket '${bucket}' not found.")
-    log_info("Creating Bucket")
+  node('ctrl' && 'dev') {
+    fetch_infrastructure_code()
 
-    node('ctrl' && 'dev') {
-      fetch_infrastructure_code()
+    extra_args = "-var environment=${ENV}"
+    tf_scaffold('plan', tf_component, extra_args)
+    tf_scaffold('apply', tf_component, extra_args)
 
-      extra_args = "--target module.${tf_component}.aws_s3_bucket.s3_bucket -var environment=${ENV}"
-      tf_scaffold('plan', tf_component, extra_args)
-      tf_scaffold('apply', tf_component, extra_args)
-    }
+    s3_location = tf_scaffold('output s3_location', tf_component, extra_args)
+    echo s3_location
   }
 }
 
 def build_and_upload_js(bucket) {
   dir("app") {
-    sh("npm install run build")
+    sh("npm install")
+    sh("npm run build")
 
     dir("dist") {
       sh("ls -lah")
@@ -169,7 +162,6 @@ def build_and_deploy_lambda(params) {
   }
 
   stage('TF Plan & Apply ' + name) {
-    //todo zamknij to w metode terraform_component_plan_and_aplly
     node('ctrl' && 'dev') {
       get_tfenv()
       fetch_infrastructure_code()
@@ -198,13 +190,13 @@ node('builder') {
 
             log_info("Building branch \"${BRANCH}\"")
 
-            stage('Verify S3 Bucket ' + name) {
-              verify_or_create_bucket(bucket, 's3')
+            stage('Verify S3 Bucket') {
+              verify_or_create_bucket('uk.gov.dvsa.vehicle-recalls-test-new.' + ENV, 's3')
             }
 
             build_and_deploy_lambda(
               name: 'Fake SMMT',
-              bucket: 'uk.gov.dvsa.vehicle-recalls.' + ENV,
+              bucket: 'uk.gov.dvsa.vehicle-recalls-test-new.' + ENV,
               repo: 'vehicle-recalls-fake-smmt-service',
               tf_component: 'fake_smmt',
               code_branch: BRANCH
@@ -213,7 +205,7 @@ node('builder') {
 
             build_and_deploy_lambda(
               name: 'Vehicle Recalls',
-              bucket: 'uk.gov.dvsa.vehicle-recalls.' + ENV,
+              bucket: 'uk.gov.dvsa.vehicle-recalls-test-new.' + ENV,
               repo: 'vehicle-recalls-api',
               tf_component: 'vehicle_recalls_api',
               code_branch: BRANCH

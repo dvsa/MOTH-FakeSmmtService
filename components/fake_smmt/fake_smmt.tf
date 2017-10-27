@@ -4,10 +4,11 @@ module "fake_smmt" {
   project                   = "${var.project}"                                # has default value
   environment               = "${var.environment}"
   lambda_s3_key             = "${var.lambda_s3_key}"
+  lambda_s3_bucket          = "${var.lambda_s3_bucket}"
   lambda_function_name      = "fake-smmt"
   lambda_handler            = "src/smmtService.handler"
   lambda_publish            = "true"
-  lambda_memory_size        = "768"
+  lambda_memory_size        = "256"
   lambda_timeout            = "15"
   lambda_ver                = "$LATEST"
 }

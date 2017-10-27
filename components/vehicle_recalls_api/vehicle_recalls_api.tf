@@ -4,6 +4,7 @@ module "vehicle_recalls_api" {
   project                   = "${var.project}"                                # has default value
   environment               = "${var.environment}"
   lambda_s3_key             = "${var.lambda_s3_key}"
+  lambda_s3_bucket          = "${var.lambda_s3_bucket}"
   lambda_function_name      = "vehicle-recalls-api"
   lambda_handler            = "src/main.handler"
   lambda_publish            = "true"
