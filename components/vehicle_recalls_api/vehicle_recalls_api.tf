@@ -3,8 +3,6 @@ module "vehicle_recalls_api" {
   aws_region                = "${var.aws_region}"                             # has default value
   project                   = "${var.project}"                                # has default value
   environment               = "${var.environment}"
-  bucket_prefix             = "${var.bucket_prefix}"                          # has default value
-  bucket_versioning_enabled = "${var.bucket_versioning_enabled}"              # has default value
   lambda_s3_key             = "${var.lambda_s3_key}"
   lambda_function_name      = "vehicle-recalls-api"
   lambda_handler            = "src/main.handler"

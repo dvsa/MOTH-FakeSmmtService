@@ -159,10 +159,6 @@ def build_and_deploy_lambda(params) {
   String code_branch = params.code_branch
   dist = ''
 
-  stage('Verify S3 Bucket ' + name) {
-    verify_or_create_bucket(bucket, tf_component)
-  }
-
   stage('Build ' + name) {
     sh("rm -rf ${repo}")
 
@@ -173,6 +169,7 @@ def build_and_deploy_lambda(params) {
   }
 
   stage('TF Plan & Apply ' + name) {
+    //todo zamknij to w metode terraform_component_plan_and_aplly
     node('ctrl' && 'dev') {
       get_tfenv()
       fetch_infrastructure_code()
@@ -201,9 +198,13 @@ node('builder') {
 
             log_info("Building branch \"${BRANCH}\"")
 
+            stage('Verify S3 Bucket ' + name) {
+              verify_or_create_bucket(bucket, 's3')
+            }
+
             build_and_deploy_lambda(
               name: 'Fake SMMT',
-              bucket: 'uk.gov.dvsa.vehicle-recalls.fake_smmt.' + ENV,
+              bucket: 'uk.gov.dvsa.vehicle-recalls.' + ENV,
               repo: 'vehicle-recalls-fake-smmt-service',
               tf_component: 'fake_smmt',
               code_branch: BRANCH
