@@ -23,15 +23,28 @@ def log_info(String info) {
   echo "[INFO] ${info}"
 }
 
+def bucket_exists(String bucket) {
+  return sh_status("aws s3 ls s3://${bucket} --region ${AWS_REGION} 2>&1 | grep -q -e \'NoSuchBucket\' -e \'AccessDenied\'")
+}
+
 def verify_or_create_bucket(String bucket_prefix, String tf_component) {
-  node('ctrl' && 'dev') {
-    fetch_infrastructure_code()
+  bucket = bucket_prefix + ENV
 
-    extra_args = "-var environment=${ENV} " +
-                 "-var bucket_prefix=${bucket_prefix}"
+  if (bucket_exists(bucket) == 1) {
+    log_info("Bucket ${bucket} found")
+  } else {
+    log_info("Bucket ${bucket} not found.")
+    log_info("Creating Bucket")
 
-    tf_scaffold('plan', tf_component, extra_args)
-    tf_scaffold('apply', tf_component, extra_args)
+    node('ctrl' && 'dev') {
+      fetch_infrastructure_code()
+
+      extra_args = "-var environment=${ENV} " +
+        "-var bucket_prefix=${bucket_prefix}"
+
+      tf_scaffold('plan', tf_component, extra_args)
+      tf_scaffold('apply', tf_component, extra_args)
+    }
   }
 }
 
