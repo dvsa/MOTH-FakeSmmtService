@@ -11,7 +11,8 @@ module "vehicle_recalls_api" {
   lambda_memory_size        = "256"
   lambda_timeout            = "15"
   lambda_ver                = "$LATEST"
-  lambda_env_vars           = var.lambda_env_vars
+  lambda_smmt_uri           = "${var.lambda_env_vars["lambda_smmt_uri"]}"
+  lambda_smmt_key           = "${var.lambda_env_vars["lambda_smmt_key"]}"
 }
 
 output "api_gateway_url" {
