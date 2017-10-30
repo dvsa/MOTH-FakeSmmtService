@@ -2,9 +2,9 @@ module "fake_smmt" {
   source                    = "/var/lib/jenkins/workspace/Recalls/recalls-build/recalls-terraform/lambda"
   aws_region                = "${var.aws_region}"                             # has default value
   project                   = "${var.project}"                                # has default value
+  bucket_prefix             = "${var.bucket_prefix}"
   environment               = "${var.environment}"
   lambda_s3_key             = "${var.lambda_s3_key}"
-  lambda_s3_bucket          = "${var.lambda_s3_bucket}"
   lambda_function_name      = "fake-smmt"
   lambda_handler            = "src/smmtService.handler"
   lambda_publish            = "true"

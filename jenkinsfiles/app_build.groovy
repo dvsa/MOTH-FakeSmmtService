@@ -2,6 +2,7 @@ AWS_REGION = 'eu-west-1'
 TF_LOG_LEVEL = 'ERROR'
 ENV = 'int'
 TF_PROJECT = 'vehicle-recalls'
+BUCKET_PREFIX = 'uk.gov.dvsa.vehicle-recalls.'
 BRANCH = params.BRANCH
 
 def sh_output(String script) {
@@ -30,8 +31,8 @@ def verify_or_create_bucket(String bucket, String tf_component) {
     tf_scaffold('plan', tf_component, extra_args)
     tf_scaffold('apply', tf_component, extra_args)
 
-    s3_location = tf_scaffold('output s3_location', tf_component, extra_args)
-    echo s3_location
+    s3_location = tf_scaffold('output s3_location', tf_component, "")
+    return s3_location
   }
 }
 
@@ -167,7 +168,8 @@ def build_and_deploy_lambda(params) {
       fetch_infrastructure_code()
 
       def vars = "-var environment=${ENV} " +
-                 "-var lambda_s3_key=${dist}"
+                 "-var lambda_s3_key=${dist} " +
+                 "-var bucket_prefix=${BUCKET_PREFIX}"
 
       tf_scaffold('plan', tf_component, vars)
       tf_scaffold('apply', tf_component, vars)
@@ -191,12 +193,13 @@ node('builder') {
             log_info("Building branch \"${BRANCH}\"")
 
             stage('Verify S3 Bucket') {
-              verify_or_create_bucket('uk.gov.dvsa.vehicle-recalls-test-new.' + ENV, 's3')
+              verify_or_create_bucket(BUCKET_PREFIX + ENV, 's3')
+
             }
 
             build_and_deploy_lambda(
               name: 'Fake SMMT',
-              bucket: 'uk.gov.dvsa.vehicle-recalls-test-new.' + ENV,
+              bucket: BUCKET_PREFIX + ENV,
               repo: 'vehicle-recalls-fake-smmt-service',
               tf_component: 'fake_smmt',
               code_branch: BRANCH
@@ -205,7 +208,7 @@ node('builder') {
 
             build_and_deploy_lambda(
               name: 'Vehicle Recalls',
-              bucket: 'uk.gov.dvsa.vehicle-recalls-test-new.' + ENV,
+              bucket: BUCKET_PREFIX + ENV,
               repo: 'vehicle-recalls-api',
               tf_component: 'vehicle_recalls_api',
               code_branch: BRANCH
