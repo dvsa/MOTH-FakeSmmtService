@@ -127,7 +127,7 @@ def tf_scaffold(action, component, extra_args) {
       "TF_LOG=${TF_LOG_LEVEL}"
     ]) {
       sh """
-      export TFENV_DEBUG=0
+      export TFENV_DEBUG=1
       pwd
       ls
       bash -x recalls-infrastructure/bin/terraform.sh \
