@@ -21,12 +21,10 @@ variable "lambda_s3_key" {
   default = "default, when I am only creating bucket, I don't need it"
 }
 
-variable "lambda_smmt_uri" {
-  type    = "string"
-  default = "https://o2jf3z94li.execute-api.eu-west-2.amazonaws.com/dev/vincheck"
-}
-
-variable "lambda_smmt_key" {
-  type    = "string"
-  default = "localApiKey"
+variable "lambda_env_vars" {
+  type    = "map"
+  default = {
+    lambda_smmt_uri = "https://o2jf3z94li.execute-api.eu-west-2.amazonaws.com/dev/vincheck"
+    lambda_smmt_key = "localApiKey"
+  }
 }
