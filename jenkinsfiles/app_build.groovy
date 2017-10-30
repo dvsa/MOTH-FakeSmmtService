@@ -154,7 +154,7 @@ def build_and_deploy_lambda(params) {
   dist = ''
 
   stage('Build ' + name) {
-    sh("rm -rf ${repo}")
+    sh("rm -rf \"${repo}\"")
 
     checkout_github_repo_branch_or_master("dvsa", repo, code_branch)
     dir(repo) {
@@ -206,7 +206,7 @@ node('builder') {
 
             build_and_deploy_lambda(
               name: 'Vehicle Recalls',
-              bucket_preifx: BUCKET_PREFIX,
+              bucket_prefix: BUCKET_PREFIX,
               repo: 'vehicle-recalls-api',
               tf_component: 'vehicle_recalls_api',
               code_branch: BRANCH
