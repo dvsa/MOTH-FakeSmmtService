@@ -23,16 +23,15 @@ def log_info(String info) {
   echo "[INFO] ${info}"
 }
 
-def verify_or_create_bucket(String bucket, String tf_component) {
+def verify_or_create_bucket(String bucket_prefix, String tf_component) {
   node('ctrl' && 'dev') {
     fetch_infrastructure_code()
 
-    extra_args = "-var environment=${ENV}"
+    extra_args = "-var environment=${ENV} " +
+                 "-var bucket_prefix=${bucket_prefix}"
+
     tf_scaffold('plan', tf_component, extra_args)
     tf_scaffold('apply', tf_component, extra_args)
-
-    s3_location = tf_scaffold('output s3_location', tf_component, "")
-    return s3_location
   }
 }
 
@@ -147,10 +146,11 @@ def get_tfenv() {
 
 def build_and_deploy_lambda(params) {
   String name = params.name
-  String bucket = params.bucket
   String repo = params.repo
   String tf_component = params.tf_component
   String code_branch = params.code_branch
+  String bucket_prefix = params.bucket_prefix
+  String bucket = bucket_prefix + ENV
   dist = ''
 
   stage('Build ' + name) {
@@ -169,7 +169,7 @@ def build_and_deploy_lambda(params) {
 
       def vars = "-var environment=${ENV} " +
                  "-var lambda_s3_key=${dist} " +
-                 "-var bucket_prefix=${BUCKET_PREFIX}"
+                 "-var bucket_prefix=${bucket_prefix}"
 
       tf_scaffold('plan', tf_component, vars)
       tf_scaffold('apply', tf_component, vars)
@@ -193,27 +193,24 @@ node('builder') {
             log_info("Building branch \"${BRANCH}\"")
 
             stage('Verify S3 Bucket') {
-              verify_or_create_bucket(BUCKET_PREFIX + ENV, 's3')
-
+              verify_or_create_bucket(BUCKET_PREFIX, 's3')
             }
 
             build_and_deploy_lambda(
               name: 'Fake SMMT',
-              bucket: BUCKET_PREFIX + ENV,
+              bucket_prefix: BUCKET_PREFIX,
               repo: 'vehicle-recalls-fake-smmt-service',
               tf_component: 'fake_smmt',
               code_branch: BRANCH
             )
 
-
             build_and_deploy_lambda(
               name: 'Vehicle Recalls',
-              bucket: BUCKET_PREFIX + ENV,
+              bucket_preifx: BUCKET_PREFIX,
               repo: 'vehicle-recalls-api',
               tf_component: 'vehicle_recalls_api',
               code_branch: BRANCH
             )
-
           }
         }
       }
