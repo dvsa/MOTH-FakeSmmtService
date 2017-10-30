@@ -126,10 +126,8 @@ def tf_scaffold(action, component, extra_args) {
       'PATH+=/opt/tfenv/bin',
       "TF_LOG=${TF_LOG_LEVEL}"
     ]) {
-      sh """
+      return sh_output("""
       export TFENV_DEBUG=0
-      pwd
-      ls
       bash -x recalls-infrastructure/bin/terraform.sh \
         --action ${action} \
         --project ${TF_PROJECT} \
@@ -137,7 +135,7 @@ def tf_scaffold(action, component, extra_args) {
         --component ${component} \
         --region ${AWS_REGION} \
         -- ${extra_args}
-      """
+      """)
     }
   }
 }
@@ -186,6 +184,10 @@ def build_and_deploy_lambda(params) {
 
       tf_scaffold('plan', tf_component, vars)
       tf_scaffold('apply', tf_component, vars)
+
+      api_url = tf_scaffold('output api_gateway_url', tf_component, "")
+      echo "API URL"
+      echo api_url
     }
   }
 }
