@@ -130,7 +130,7 @@ def tf_scaffold(action, component, extra_args) {
       export TFENV_DEBUG=0
       pwd
       ls
-      bash -x /var/lib/jenkins/workspace/Recalls/recalls-build/recalls-infrastructure/bin/terraform.sh \
+      bash -x recalls-infrastructure/bin/terraform.sh \
         --action ${action} \
         --project ${TF_PROJECT} \
         --environment ${ENV} \
