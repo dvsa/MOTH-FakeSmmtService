@@ -24,7 +24,7 @@ variable "lambda_s3_key" {
 variable "lambda_env_vars" {
   type    = "map"
   default = {
-    "SMMT_API_KEY" = "https://o2jf3z94li.execute-api.eu-west-2.amazonaws.com/dev/vincheck"
-    "SMMT_API_URI" = "localApiKey"
+    "SMMT_API_URI" = "https://o2jf3z94li.execute-api.eu-west-2.amazonaws.com/dev/vincheck"
+    "SMMT_API_KEY" = "localApiKey"
   }
 }
