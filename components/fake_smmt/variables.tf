@@ -23,5 +23,7 @@ variable "lambda_s3_key" {
 
 variable "lambda_env_vars" {
   type    = "map"
-  default = {}
+  default = {
+    "default" = "default"
+  }
 }
