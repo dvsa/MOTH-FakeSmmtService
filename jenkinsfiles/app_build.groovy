@@ -113,7 +113,7 @@ def checkout_gitlab_repo_branch_or_master(group, repo, branch) {
   }
 }
 
-def tf_scaffold(action, component, extra_args) {
+def tf_scaffold(action, component, extra_args, returnStdout=false) {
   log_info("Terraform ${action} on \"${component}\" with \"${extra_args}\"")
 
   env_type = 'FB'
@@ -126,23 +126,26 @@ def tf_scaffold(action, component, extra_args) {
       'PATH+=/opt/tfenv/bin',
       "TF_LOG=${TF_LOG_LEVEL}"
     ]) {
-      return sh_output("""
-      export TFENV_DEBUG=0
-      bash -x recalls-infrastructure/bin/terraform.sh \
-        --action ${action} \
-        --project ${TF_PROJECT} \
-        --environment ${ENV} \
-        --component ${component} \
-        --region ${AWS_REGION} \
-        -- ${extra_args}
-      """)
+      return sh(
+        script: """
+        export TFENV_DEBUG=0
+        bash -x recalls-infrastructure/bin/terraform.sh \
+          --action ${action} \
+          --project ${TF_PROJECT} \
+          --environment ${ENV} \
+          --component ${component} \
+          --region ${AWS_REGION} \
+          -- ${extra_args}
+        """,
+        returnStdout: returnStdout
+      )
     }
   }
 }
 
 def tf_output(variable, tf_component) {
   //returning last line of terraform scaffold output
-  return tf_scaffold("output ${variable}", tf_component, "").split("\n")[-1]
+  return tf_scaffold("output ${variable}", tf_component, "", true).split("\n")[-1]
 }
 
 def populate_tfvars(key, value) {
