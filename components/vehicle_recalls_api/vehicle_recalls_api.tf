@@ -1,5 +1,5 @@
 module "vehicle_recalls_api" {
-  source                    = "../../../recalls-terraform/lambda"
+  source                    = "../../modules/lambda"
   aws_region                = "${var.aws_region}"                             # has default value
   project                   = "${var.project}"                                # has default value
   bucket_prefix             = "${var.bucket_prefix}"                          # has default value

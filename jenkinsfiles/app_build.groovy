@@ -141,8 +141,6 @@ def tf_scaffold(action, component, extra_args) {
 }
 
 def fetch_infrastructure_code() {
-  checkout_gitlab_repo_branch_or_master('vehicle-recalls', 'recalls-terraform', "${BRANCH}")
-  sh("ls -lah")
   checkout_gitlab_repo_branch_or_master('vehicle-recalls', 'recalls-infrastructure', "${BRANCH}")
   sh("ls -lah")
 }
