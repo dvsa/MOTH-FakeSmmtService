@@ -231,7 +231,7 @@ node('builder') {
               repo: 'vehicle-recalls-api',
               tf_component: 'vehicle_recalls_api',
               code_branch: BRANCH,
-              extra_vars: "-var 'lambda_env_vars={ SMMT_API_URI = \"${fake_smmt_url}/vincheck\", SMMT_API_KEY = \"localApiKey\"'"
+              extra_vars: "-var lambda_env_vars={SMMT_API_URI=\"${fake_smmt_url}/vincheck\", SMMT_API_KEY = \"localApiKey\""
             )
           }
         }
