@@ -183,8 +183,8 @@ def build_and_deploy_lambda(params) {
       tf_scaffold('plan', tf_component, vars)
       tf_scaffold('apply', tf_component, vars)
 
-      api_url = tf_scaffold('output api_gateway_url', tf_component, "")
-      echo "<API_URL>{$api_url}</API_URL>"
+      api_url = tf_scaffold('output api_gateway_url', tf_component, "").split("\n")[-1]
+      echo "<API_URL>${api_url}</API_URL>"
     }
   }
 }
