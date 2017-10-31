@@ -15,3 +15,8 @@ variable "bucket_prefix" {
 variable "environment" {
   type = "string"
 }
+
+variable "lambda_env_vars" {
+  type    = "map"
+  default = {}
+}

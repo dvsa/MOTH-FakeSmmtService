@@ -10,6 +10,10 @@ resource "aws_lambda_function" "lambda" {
   memory_size   = "${var.lambda_memory_size}"
   timeout       = "${var.lambda_timeout}"
 
+  environment {
+    variables = "${var.lambda_env_vars}"
+  }
+
   depends_on = ["aws_api_gateway_rest_api.api"]
 }
 
