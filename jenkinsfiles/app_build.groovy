@@ -145,6 +145,14 @@ def tf_output(variable, tf_component) {
   return tf_scaffold("output ${variable}", tf_component, "").split("\n")[-1]
 }
 
+def populate_tfvars(key, value) {
+  log_info("Populating tfvars \"${key}\" with \"${value}\"")
+
+  tfvars_path = "env_${AWS_REGION}_${ENV}.tfvars"
+
+  sh("sed -i 's|%${key}%|${value}|g' recalls-infrastructure/etc/${tfvars_path}")
+}
+
 def fetch_infrastructure_code() {
   checkout_gitlab_repo_branch_or_master('vehicle-recalls', 'recalls-infrastructure', "${BRANCH}")
   sh("ls -lah")
@@ -165,7 +173,7 @@ def build_and_deploy_lambda(params) {
   String code_branch = params.code_branch
   String bucket_prefix = params.bucket_prefix
   String bucket = bucket_prefix + ENV
-  String extra_vars = params.extra_vars
+  tfvars = params.tfvars
   dist = ''
 
   stage('Build ' + name) {
@@ -182,13 +190,12 @@ def build_and_deploy_lambda(params) {
       get_tfenv()
       fetch_infrastructure_code()
 
-      def vars = "-var environment=${ENV} " +
-                 "-var lambda_s3_key=${dist} " +
-                 "-var bucket_prefix=${bucket_prefix} "
-
-      if(extra_vars) {
-        vars += extra_vars
+      if(tfvars) {
+        tfvars.each { entry ->
+          populate_tfvars(entry.key, entry.value)
+        }
       }
+      populate_tfvars("lambda_s3_key", dist)
 
       tf_scaffold('plan', tf_component, vars)
       tf_scaffold('apply', tf_component, vars)
@@ -231,7 +238,9 @@ node('builder') {
               repo: 'vehicle-recalls-api',
               tf_component: 'vehicle_recalls_api',
               code_branch: BRANCH,
-              extra_vars: "-var 'lambda_env_vars={SMMT_API_URI=\"${fake_smmt_url}/vincheck\",SMMT_API_KEY=\"localApiKey\"}'"
+              tfvars: [
+                "fake_smmt_url": fake_smmt_url
+              ]
             )
           }
         }
