@@ -225,6 +225,7 @@ node('builder') {
           stage('Verify S3 Bucket') {
             verify_or_create_bucket(BUCKET_PREFIX, 's3')
           }
+          System.exit(0)
 
           fake_smmt_url = build_and_deploy_lambda(
             name: 'Fake SMMT',
