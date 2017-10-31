@@ -37,7 +37,7 @@ def bucket_exists(String bucket) {
 
 def verify_or_create_bucket(String bucket_prefix, String tf_component) {
   bucket = bucket_prefix + ENV
-
+  System.exit(0)
   if (bucket_exists(bucket) == 1) {
     log_info("Bucket ${bucket} found")
   } else {
@@ -225,7 +225,6 @@ node('builder') {
           stage('Verify S3 Bucket') {
             verify_or_create_bucket(BUCKET_PREFIX, 's3')
           }
-          System.exit(0)
 
           fake_smmt_url = build_and_deploy_lambda(
             name: 'Fake SMMT',
