@@ -197,8 +197,8 @@ def build_and_deploy_lambda(params) {
       }
       populate_tfvars("lambda_s3_key", dist)
 
-      tf_scaffold('plan', tf_component, vars)
-      tf_scaffold('apply', tf_component, vars)
+      tf_scaffold('plan', tf_component, "")
+      tf_scaffold('apply', tf_component, "")
 
       return tf_output('api_gateway_url', tf_component)
     }
