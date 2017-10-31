@@ -20,3 +20,17 @@ variable "lambda_env_vars" {
   type    = "map"
   default = {}
 }
+
+/*
+  Sample map with quota and rate limit:
+  {
+    "quota_monthly" = 2500000
+    "burst_limit" = 40
+    "rate_limit" = 2
+  }
+*/
+variable "api_rate_limit_vars" {
+  type    = "map"
+  default = {}
+  description = "Pass rate limit and quota vars if required. Pass empty map if rate limiting not required"
+}

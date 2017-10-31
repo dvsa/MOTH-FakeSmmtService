@@ -28,3 +28,12 @@ variable "lambda_env_vars" {
     "SMMT_API_KEY" = "localApiKey"
   }
 }
+
+variable "api_rate_limit_vars" {
+  type    = "map"
+  default = {
+    "quota_monthly" = 2500000
+    "burst_limit" = 40
+    "rate_limit" = 2
+  }
+}

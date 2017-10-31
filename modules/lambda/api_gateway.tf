@@ -12,7 +12,7 @@ resource "aws_api_gateway_method" "api_root_any" {
   resource_id      = "${aws_api_gateway_rest_api.api.root_resource_id}"
   http_method      = "ANY"
   authorization    = "NONE"
-  api_key_required = "false"
+  api_key_required = "${length(var.api_rate_limit_vars) > 0}"
 }
 
 # integration between ROOT resource's ANY method and Lambda function (back-end)
@@ -75,7 +75,7 @@ resource "aws_api_gateway_method" "api_wildcard_any" {
   resource_id      = "${aws_api_gateway_resource.api_wildcard.id}"
   http_method      = "ANY"
   authorization    = "NONE"
-  api_key_required = "false"
+  api_key_required = "${length(var.api_rate_limit_vars) > 0}"
 }
 
 # integration between Lambda Wildcard resource's POST method and Lambda function (back-end)
@@ -133,6 +133,53 @@ resource "aws_api_gateway_deployment" "api" {
     "aws_api_gateway_integration.api_root_any",
     "aws_api_gateway_method.api_wildcard_any",
     "aws_api_gateway_integration.api_wildcard_any",
+  ]
+}
+
+####################################################################################################################################
+# API KEY AND USAGE PLAN
+
+resource "aws_api_gateway_api_key" "api_key" {
+  count         = "${length(var.api_rate_limit_vars) > 0 ? 1 : 0}"
+  name          = "${var.lambda_function_name}-${var.environment}-api-key"
+  description   = "Api key for calling ${aws_api_gateway_rest_api.api.name}"
+}
+
+resource "aws_api_gateway_usage_plan" "usage_limits" {
+  count         = "${length(var.api_rate_limit_vars) > 0 ? 1 : 0}"
+  name          = "${var.lambda_function_name}-${var.environment}-api-plan"
+  description   = "Usage plan defining throttling for ${aws_api_gateway_rest_api.api.name}"
+
+  api_stages {
+    api_id = "${aws_api_gateway_rest_api.api.id}"
+    stage  = "${aws_api_gateway_deployment.api.stage_name}"
+  }
+
+  throttle_settings {
+    rate_limit  = "${var.api_rate_limit_vars["rate_limit"]}"
+    burst_limit = "${var.api_rate_limit_vars["burst_limit"]}"
+  }
+
+  quota_settings {
+    limit  = "${var.api_rate_limit_vars["quota_monthly"]}"
+    offset = 0
+    period = "MONTH"
+  }
+
+  depends_on = [
+    "aws_api_gateway_deployment.api",
+    "aws_api_gateway_api_key.api_key"
+  ]
+}
+
+resource "aws_api_gateway_usage_plan_key" "plan_api_key" {
+  count         = "${length(var.api_rate_limit_vars) > 0 ? 1 : 0}"
+  key_id        = "${aws_api_gateway_api_key.api_key.id}"
+  key_type      = "API_KEY"
+  usage_plan_id = "${aws_api_gateway_usage_plan.usage_limits.id}"
+
+  depends_on = [
+    "aws_api_gateway_usage_plan.usage_limits"
   ]
 }
 
