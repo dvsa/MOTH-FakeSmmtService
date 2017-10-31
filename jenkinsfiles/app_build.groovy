@@ -140,6 +140,11 @@ def tf_scaffold(action, component, extra_args) {
   }
 }
 
+def tf_output(variable, tf_component) {
+  //returning last line of terraform scaffold output
+  return tf_scaffold("ouput ${variable}", tf_component, "").split("\n")[-1]
+}
+
 def fetch_infrastructure_code() {
   checkout_gitlab_repo_branch_or_master('vehicle-recalls', 'recalls-infrastructure', "${BRANCH}")
   sh("ls -lah")
@@ -160,6 +165,7 @@ def build_and_deploy_lambda(params) {
   String code_branch = params.code_branch
   String bucket_prefix = params.bucket_prefix
   String bucket = bucket_prefix + ENV
+  String extra_vars = params.extra_vars
   dist = ''
 
   stage('Build ' + name) {
@@ -178,13 +184,16 @@ def build_and_deploy_lambda(params) {
 
       def vars = "-var environment=${ENV} " +
                  "-var lambda_s3_key=${dist} " +
-                 "-var bucket_prefix=${bucket_prefix}"
+                 "-var bucket_prefix=${bucket_prefix} "
+
+      if(extra_vars) {
+        vars += extra_vars
+      }
 
       tf_scaffold('plan', tf_component, vars)
       tf_scaffold('apply', tf_component, vars)
 
-      api_url = tf_scaffold('output api_gateway_url', tf_component, "").split("\n")[-1]
-      echo "<API_URL>${api_url}</API_URL>"
+      return tf_output('api_gateway_url', tf_component)
     }
   }
 }
@@ -208,7 +217,7 @@ node('builder') {
               verify_or_create_bucket(BUCKET_PREFIX, 's3')
             }
 
-            build_and_deploy_lambda(
+            fake_smmt_url = build_and_deploy_lambda(
               name: 'Fake SMMT',
               bucket_prefix: BUCKET_PREFIX,
               repo: 'vehicle-recalls-fake-smmt-service',
@@ -221,7 +230,8 @@ node('builder') {
               bucket_prefix: BUCKET_PREFIX,
               repo: 'vehicle-recalls-api',
               tf_component: 'vehicle_recalls_api',
-              code_branch: BRANCH
+              code_branch: BRANCH,
+              extra_vars: "-var 'lambda_env_vars={ SMMT_API_URI = \"${fake_smmt_url}/vincheck\", SMMT_API_KEY = \"localApiKey\"'"
             )
           }
         }
