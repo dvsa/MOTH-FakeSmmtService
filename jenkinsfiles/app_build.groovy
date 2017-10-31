@@ -1,9 +1,17 @@
+@Liblary('PipelineUtils')
+import dvsa.aws.mot.jenkins.pipeline.common.CommonFunctions
+
+def commonFunctionsFactory = new CommonFunctions()
+
 AWS_REGION = 'eu-west-1'
 TF_LOG_LEVEL = 'ERROR'
 ENV = 'int'
 TF_PROJECT = 'vehicle-recalls'
 BUCKET_PREFIX = 'uk.gov.dvsa.vehicle-recalls.'
 BRANCH = params.BRANCH
+
+String jenkinsctrl_node_label = 'ctrl'
+String account = 'dev'
 
 def sh_output(String script) {
   return sh(
@@ -36,13 +44,12 @@ def verify_or_create_bucket(String bucket_prefix, String tf_component) {
     log_info("Bucket ${bucket} not found.")
     log_info("Creating Bucket")
 
-    node('ctrl' && 'dev') {
+    node(jenkinsctrl_node_label&&account) {
       fetch_infrastructure_code()
 
       extra_args = "-var environment=${ENV} " +
         "-var bucket_prefix=${bucket_prefix}"
 
-      tf_scaffold('plan', tf_component, extra_args)
       tf_scaffold('apply', tf_component, extra_args)
     }
   }
@@ -213,39 +220,30 @@ node('builder') {
 
     wrap([$class: 'TimestamperBuildWrapper']) {
       wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'FB_AWS_CREDENTIALS', usernameVariable: 'aws_key_id', passwordVariable: 'aws_secret_key']]) {
-          withEnv([
-            "AWS_DEFAULT_REGION=${AWS_REGION}",
-            "AWS_ACCESS_KEY_ID=${env.aws_key_id}",
-            "AWS_SECRET_ACCESS_KEY=${env.aws_secret_key}",
-            "BUILDSTAMP=${env.BUILD_NUMBER}"
-          ]) {
+          log_info("Building branch \"${BRANCH}\"")
 
-            log_info("Building branch \"${BRANCH}\"")
-
-            stage('Verify S3 Bucket') {
-              verify_or_create_bucket(BUCKET_PREFIX, 's3')
-            }
-
-            fake_smmt_url = build_and_deploy_lambda(
-              name: 'Fake SMMT',
-              bucket_prefix: BUCKET_PREFIX,
-              repo: 'vehicle-recalls-fake-smmt-service',
-              tf_component: 'fake_smmt',
-              code_branch: BRANCH
-            )
-
-            build_and_deploy_lambda(
-              name: 'Vehicle Recalls',
-              bucket_prefix: BUCKET_PREFIX,
-              repo: 'vehicle-recalls-api',
-              tf_component: 'vehicle_recalls_api',
-              code_branch: BRANCH,
-              tfvars: [
-                "fake_smmt_url": fake_smmt_url
-              ]
-            )
+          stage('Verify S3 Bucket') {
+            verify_or_create_bucket(BUCKET_PREFIX, 's3')
           }
+
+          fake_smmt_url = build_and_deploy_lambda(
+            name: 'Fake SMMT',
+            bucket_prefix: BUCKET_PREFIX,
+            repo: 'vehicle-recalls-fake-smmt-service',
+            tf_component: 'fake_smmt',
+            code_branch: BRANCH
+          )
+
+          build_and_deploy_lambda(
+            name: 'Vehicle Recalls',
+            bucket_prefix: BUCKET_PREFIX,
+            repo: 'vehicle-recalls-api',
+            tf_component: 'vehicle_recalls_api',
+            code_branch: BRANCH,
+            tfvars: [
+              "fake_smmt_url": fake_smmt_url
+            ]
+          )
         }
       }
     }
