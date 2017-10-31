@@ -142,7 +142,7 @@ def tf_scaffold(action, component, extra_args) {
 
 def tf_output(variable, tf_component) {
   //returning last line of terraform scaffold output
-  return tf_scaffold("ouput ${variable}", tf_component, "").split("\n")[-1]
+  return tf_scaffold("output ${variable}", tf_component, "").split("\n")[-1]
 }
 
 def fetch_infrastructure_code() {
