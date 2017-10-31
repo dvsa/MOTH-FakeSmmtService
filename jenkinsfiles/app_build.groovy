@@ -1,4 +1,4 @@
-@Liblary('PipelineUtils')
+@Library('PipelineUtils')
 import dvsa.aws.mot.jenkins.pipeline.common.CommonFunctions
 
 def commonFunctionsFactory = new CommonFunctions()
