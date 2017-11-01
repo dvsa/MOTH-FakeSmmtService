@@ -198,15 +198,15 @@ def build_and_deploy_lambda(params) {
 
 
 
-pipeline {
 
-  options {
-    ansiColor('xterm')
-    timestamps()
-    timeout(time: 1, unit: 'HOURS')
-  } // options
-  stages {
-    stage('Verify S3 Bucket') {
+stage('Verify S3 Bucket') {
+  wrap([
+    $class: 'TimestamperBuildWrapper'
+  ]) {
+    wrap([
+      $class:       'AnsiColorBuildWrapper',
+      colorMapName: 'xterm'
+    ]) {
       node(jenkinsctrl_node_label&&account) {
         log_info("Building branch \"${BRANCH}\"")
         if (bucket_exists(bucket) == 1) {
@@ -214,15 +214,17 @@ pipeline {
         } else {
           log_info("Bucket ${bucket} not found.")
           log_info("Creating Bucket")
-            fetch_infrastructure_code()
+          fetch_infrastructure_code()
 
-            extra_args = "-var environment=${ENV} " +
-              "-var bucket_prefix=${bucket_prefix}"
-            return
-            tf_scaffold('apply', tf_component, extra_args)
+          extra_args = "-var environment=${ENV} " +
+          "-var bucket_prefix=${bucket_prefix}"
+          return
+          tf_scaffold('apply', tf_component, extra_args)
         }
       }
     }
+  }
+}
 
     node('builder') {
         fake_smmt_url = build_and_deploy_lambda(
