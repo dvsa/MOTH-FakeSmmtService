@@ -5,15 +5,11 @@ import dvsa.aws.mot.jenkins.pipeline.common.GlobalValues
 
 def AWSFunctionsFactory  = new AWSFunctions()
 def repoFunctionsFactory = new RepoFunctions()
-def globalValuesFactory = new GlobalValues()
+def globalValuesFactory  = new GlobalValues()
 
 String brach         = params.BRANCH
 String bucket_prefix = 'uk.gov.dvsa.vehicle-recalls.'
 String bucket        = bucket_prefix + env
-
-// Global
-String gitlab_url    = 'git@gitlab.motdev.org.uk'
-String ssh_deploy_git_creds_id = '313a82d3-f2e7-4787-837e-7517f3ce84eb'
 
 // This should be a parameter to the pipeline
 String jenkinsctrl_node_label = 'ctrl'
@@ -30,7 +26,7 @@ Map<String, Map<String, String>> gitlab = [
 
 for (repo in gitlab.keySet()) {
   if (!gitlab[repo].url) {
-    gitlab[repo].url = "${gitlab_url}:${gitlab[repo].group}/${gitlab[repo].name}.git"
+    gitlab[repo].url = "${globalValuesFactory.gitlabURL}:${gitlab[repo].group}/${gitlab[repo].name}.git"
   }
 }
 
@@ -241,9 +237,8 @@ node(jenkinsctrl_node_label&&account) {
         } else {
           log_info("Bucket ${bucket} not found.")
           log_info("Creating Bucket")
-          log_info("TEST: ${globalValuesFactory.ssh_deploy_git_creds_id}")
           node('builder') {
-            repoFunctionsFactory.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,gitlab.infastructure.name, ssh_deploy_git_creds_id)
+            repoFunctionsFactory.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,gitlab.infastructure.name, globalValuesFactory.sshDeployGitCredsId)
             sh("ls -lah")
           }
           return
