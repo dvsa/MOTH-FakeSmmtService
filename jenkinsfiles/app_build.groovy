@@ -12,7 +12,7 @@ String ENV = 'int'
 String BUCKET_PREFIX = 'uk.gov.dvsa.vehicle-recalls.'
 String jenkinsctrl_node_label = 'ctrl'
 String account = 'dev'
-Strimg bucket = bucket_prefix + ENV
+String bucket = bucket_prefix + ENV
 
 def sh_output(String script) {
   return sh(
