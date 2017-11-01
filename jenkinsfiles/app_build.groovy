@@ -1,13 +1,17 @@
 @Library('PipelineUtils@master')
-import dvsa.aws.mot.jenkins.pipeline.common.CommonFunctionsAWS
-import dvsa.aws.mot.jenkins.pipeline.common.CommonFunctionsRepo
+import dvsa.aws.mot.jenkins.pipeline.common.AWSFunctions
+import dvsa.aws.mot.jenkins.pipeline.common.RepoFunctions
+import dvsa.aws.mot.jenkins.pipeline.common.GlobalValues
 
-def commonAWSFunctionsFactory  = new CommonFunctionsAWS()
-def commontRepoFunctionsFactor = new CommonFunctionsRepo()
+def AWSFunctionsFactory  = new AWSFunctions()
+def repoFunctionsFactory = new RepoFunctions()
+def globalValuesFactory = new GlobalValues()
 
 String brach         = params.BRANCH
 String bucket_prefix = 'uk.gov.dvsa.vehicle-recalls.'
 String bucket        = bucket_prefix + env
+
+// Global
 String gitlab_url    = 'git@gitlab.motdev.org.uk'
 String ssh_deploy_git_creds_id = '313a82d3-f2e7-4787-837e-7517f3ce84eb'
 
@@ -232,13 +236,14 @@ node(jenkinsctrl_node_label&&account) {
         colorMapName: 'xterm'
       ]) {
         log_info("Building branch \"${BRANCH}\"")
-        if (commonAWSFunctionsFactory.bucketExists(bucket,aws_region,account,build_number) == 0) {
+        if (AWSFunctionsFactory.bucketExists(bucket,aws_region,account,build_number) == 0) {
           log_info("Bucket ${bucket} found")
         } else {
           log_info("Bucket ${bucket} not found.")
           log_info("Creating Bucket")
+          log_info("TEST: ${globalValuesFactory.ssh_deploy_git_creds_id}")
           node('builder') {
-            commontRepoFunctionsFactor.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,gitlab.infastructure.name, ssh_deploy_git_creds_id)
+            repoFunctionsFactory.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,gitlab.infastructure.name, ssh_deploy_git_creds_id)
             sh("ls -lah")
           }
           return
