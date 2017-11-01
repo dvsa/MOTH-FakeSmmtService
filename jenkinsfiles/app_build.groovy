@@ -238,17 +238,14 @@ node(jenkinsctrl_node_label&&account) {
         } else {
           log_info("Bucket ${bucket} not found.")
           log_info("Creating Bucket")
-          node('builder') {
-            sh("ls -lah")
-            repoFunctionsFactory.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,'custom_dir', globalValuesFactory.sshDeployGitCredsId)
-            sh("ls -lah")
-          }
-          return
-          fetch_infrastructure_code(gitlab.infastructure.branch)
+
+          repoFunctionsFactory.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,'custom_dir', globalValuesFactory.sshDeployGitCredsId)
+
 
           extra_args = "-var environment=${ENV} " +
           "-var bucket_prefix=${bucket_prefix}"
-          tf_scaffold('apply', tf_component, extra_args)
+          tf_scaffold('plan', tf_component, extra_args)
+          return
         }
       }
     }
