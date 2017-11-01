@@ -233,7 +233,7 @@ node(jenkinsctrl_node_label&&account) {
         colorMapName: 'xterm'
       ]) {
         log_info("Building branch \"${BRANCH}\"")
-        if (AWSFunctionsFactory.bucketExists(bucket,aws_region,account,build_number) == 0) {
+        if (AWSFunctionsFactory.bucketExists(bucket,aws_region,account,build_number)) {
           log_info("Bucket ${bucket} found")
         } else {
           log_info("Bucket ${bucket} not found.")
