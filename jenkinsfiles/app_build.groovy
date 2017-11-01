@@ -3,7 +3,7 @@ import dvsa.aws.mot.jenkins.pipeline.common.CommonFunctionsAWS
 import dvsa.aws.mot.jenkins.pipeline.common.CommonFunctionsRepo
 
 def commonAWSFunctionsFactory = new CommonFunctionsAWS()
-def commontRepoFunctionsFactor = new CommontFunctionsRepo()
+def commontRepoFunctionsFactor = new CommonFunctionsRepo()
 
 String brach = params.BRANCH
 String bucket_prefix = 'uk.gov.dvsa.vehicle-recalls.'
