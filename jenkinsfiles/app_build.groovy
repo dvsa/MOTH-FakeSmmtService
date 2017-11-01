@@ -241,8 +241,7 @@ node(jenkinsctrl_node_label&&account) {
 
           repoFunctionsFactory.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,'custom_dir', globalValuesFactory.sshDeployGitCredsId)
 
-
-          extra_args = "-var environment=${ENV} " +
+          extra_args = "-var environment=${env} " +
           "-var bucket_prefix=${bucket_prefix}"
           tf_scaffold('plan', tf_component, extra_args)
           return
