@@ -196,47 +196,53 @@ def build_and_deploy_lambda(params) {
   }
 }
 
-options {
-  ansiColor('xterm')
-  timestamps()
-  timeout(time: 1, unit: 'HOURS')
-} // options
 
-stage('Verify S3 Bucket') {
-  node(jenkinsctrl_node_label&&account) {
-    log_info("Building branch \"${BRANCH}\"")
-    if (bucket_exists(bucket) == 1) {
-      log_info("Bucket ${bucket} found")
-    } else {
-      log_info("Bucket ${bucket} not found.")
-      log_info("Creating Bucket")
-        fetch_infrastructure_code()
 
-        extra_args = "-var environment=${ENV} " +
-          "-var bucket_prefix=${bucket_prefix}"
-        return
-        tf_scaffold('apply', tf_component, extra_args)
+pipeline {
+
+  options {
+    ansiColor('xterm')
+    timestamps()
+    timeout(time: 1, unit: 'HOURS')
+  } // options
+  stages {
+    stage('Verify S3 Bucket') {
+      node(jenkinsctrl_node_label&&account) {
+        log_info("Building branch \"${BRANCH}\"")
+        if (bucket_exists(bucket) == 1) {
+          log_info("Bucket ${bucket} found")
+        } else {
+          log_info("Bucket ${bucket} not found.")
+          log_info("Creating Bucket")
+            fetch_infrastructure_code()
+
+            extra_args = "-var environment=${ENV} " +
+              "-var bucket_prefix=${bucket_prefix}"
+            return
+            tf_scaffold('apply', tf_component, extra_args)
+        }
+      }
+    }
+
+    node('builder') {
+        fake_smmt_url = build_and_deploy_lambda(
+          name: 'Fake SMMT',
+          bucket_prefix: BUCKET_PREFIX,
+          repo: 'vehicle-recalls-fake-smmt-service',
+          tf_component: 'fake_smmt',
+          code_branch: BRANCH
+        )
+
+        build_and_deploy_lambda(
+          name: 'Vehicle Recalls',
+          bucket_prefix: BUCKET_PREFIX,
+          repo: 'vehicle-recalls-api',
+          tf_component: 'vehicle_recalls_api',
+          code_branch: BRANCH,
+          tfvars: [
+            "fake_smmt_url": fake_smmt_url
+          ]
+        )
     }
   }
-}
-
-node('builder') {
-    fake_smmt_url = build_and_deploy_lambda(
-      name: 'Fake SMMT',
-      bucket_prefix: BUCKET_PREFIX,
-      repo: 'vehicle-recalls-fake-smmt-service',
-      tf_component: 'fake_smmt',
-      code_branch: BRANCH
-    )
-
-    build_and_deploy_lambda(
-      name: 'Vehicle Recalls',
-      bucket_prefix: BUCKET_PREFIX,
-      repo: 'vehicle-recalls-api',
-      tf_component: 'vehicle_recalls_api',
-      code_branch: BRANCH,
-      tfvars: [
-        "fake_smmt_url": fake_smmt_url
-      ]
-    )
 }
