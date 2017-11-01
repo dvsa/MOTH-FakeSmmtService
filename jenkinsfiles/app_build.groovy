@@ -9,12 +9,13 @@ def globalValuesFactory  = new GlobalValues()
 
 String brach         = params.BRANCH
 String bucket_prefix = 'uk.gov.dvsa.vehicle-recalls.'
+String env                    = 'int'
 String bucket        = bucket_prefix + env
 
 // This should be a parameter to the pipeline
 String jenkinsctrl_node_label = 'ctrl'
 String account                = 'dev'
-String env                    = 'int'
+
 
 Map<String, Map<String, String>> gitlab = [
   infastructure: [
