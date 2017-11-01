@@ -9,6 +9,7 @@ String brach         = params.BRANCH
 String bucket_prefix = 'uk.gov.dvsa.vehicle-recalls.'
 String bucket        = bucket_prefix + env
 String gitlab_url    = 'git@gitlab.motdev.org.uk'
+String ssh_deploy_git_creds_id = '313a82d3-f2e7-4787-837e-7517f3ce84eb'
 
 // This should be a parameter to the pipeline
 String jenkinsctrl_node_label = 'ctrl'
@@ -237,7 +238,7 @@ node(jenkinsctrl_node_label&&account) {
           log_info("Bucket ${bucket} not found.")
           log_info("Creating Bucket")
           node('builder') {
-            commontRepoFunctionsFactor.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,gitlab.infastructure.name)
+            commontRepoFunctionsFactor.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,gitlab.infastructure.name, ssh_deploy_git_creds_id)
             sh("ls -lah")
           }
           return
