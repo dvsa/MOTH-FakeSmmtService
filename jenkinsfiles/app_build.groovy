@@ -3,7 +3,7 @@ import dvsa.aws.mot.jenkins.pipeline.common.AWSFunctions
 import dvsa.aws.mot.jenkins.pipeline.common.RepoFunctions
 import dvsa.aws.mot.jenkins.pipeline.common.GlobalValues
 
-def AWSFunctionsFactory  = new AWSFunctions()
+def awsFunctionsFactory  = new AWSFunctions()
 def repoFunctionsFactory = new RepoFunctions()
 def globalValuesFactory  = new GlobalValues()
 
@@ -15,6 +15,7 @@ String bucket        = bucket_prefix + env
 // This should be a parameter to the pipeline
 String jenkinsctrl_node_label = 'ctrl'
 String account                = 'dev'
+String project                = 'vehicle-recalls'
 
 
 Map<String, Map<String, String>> gitlab = [
@@ -27,12 +28,10 @@ Map<String, Map<String, String>> gitlab = [
 
 for (repo in gitlab.keySet()) {
   if (!gitlab[repo].url) {
-    gitlab[repo].url = "${globalValuesFactory.gitlabURL}:${gitlab[repo].group}/${gitlab[repo].name}.git"
+    gitlab[repo].url = "${globalValuesFactory.GITLAB_URL}:${gitlab[repo].group}/${gitlab[repo].name}.git"
   }
 }
 
-
-String aws_region = 'eu-west-1'
 TF_LOG_LEVEL = 'ERROR'
 TF_PROJECT = 'vehicle-recalls'
 
@@ -55,10 +54,6 @@ def sh_status(String script) {
 
 def log_info(String info) {
   echo "[INFO] ${info}"
-}
-
-def bucket_exists(String bucket) {
-  return sh_status("aws s3 ls s3://${bucket} --region ${AWS_REGION} 2>&1 | grep -q -e \'NoSuchBucket\' -e \'AccessDenied\'")
 }
 
 def build_and_upload_js(bucket) {
@@ -169,11 +164,6 @@ def populate_tfvars(key, value) {
   sh("sed -i 's|%${key}%|${value}|g' recalls-infrastructure/etc/${tfvars_path}")
 }
 
-def fetch_infrastructure_code() {
-  checkout_gitlab_repo_branch_or_master('vehicle-recalls', 'recalls-infrastructure', "${BRANCH}")
-  sh("ls -lah")
-}
-
 def get_tfenv() {
   if (!fileExists('/opt/tfenv/bin/tfenv')) {
     dir('/opt') { check_out_github_repo('cartest', 'tfenv', 'master') }
@@ -233,17 +223,18 @@ node(jenkinsctrl_node_label&&account) {
         colorMapName: 'xterm'
       ]) {
         log_info("Building branch \"${BRANCH}\"")
-        if (AWSFunctionsFactory.bucketExists(bucket,aws_region,account,build_number)) {
+        if (awsFunctionsFactory.bucketExists(bucket, globalValuesFactory.AWS_REGION, account, build_number)) {
           log_info("Bucket ${bucket} found")
         } else {
           log_info("Bucket ${bucket} not found.")
           log_info("Creating Bucket")
 
-          repoFunctionsFactory.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,'custom_dir', globalValuesFactory.sshDeployGitCredsId)
+          repoFunctionsFactory.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,'custom_dir', globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID)
 
           extra_args = "-var environment=${env} " +
           "-var bucket_prefix=${bucket_prefix}"
-          tf_scaffold('plan', tf_component, extra_args)
+          awsFunctionsFactory.terraformScaffold(project, env, account, globalValuesFactory.AWS_REGION, null, 'terraform_plan', build_number, 's3', bucket_prefix, 'plan')
+          // tf_scaffold('plan', tf_component, extra_args)
           return
         }
       }
