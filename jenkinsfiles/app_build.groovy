@@ -210,7 +210,7 @@ node(jenkinsctrl_node_label&&account) {
         log_info("Building branch \"${BRANCH}\"")
         commonFunctionsFactory.bucketExists(bucket,aws_region,account,build_number)
 
-        if (commonFunctionsFactory.bucketExists(bucket,aws_region,account,build_number)) {
+        if (commonFunctionsFactory.bucketExists(bucket,aws_region,account,build_number) == 0) {
           log_info("Bucket ${bucket} found")
           return
         } else {
