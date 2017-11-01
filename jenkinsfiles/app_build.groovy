@@ -240,7 +240,7 @@ node(jenkinsctrl_node_label&&account) {
           log_info("Creating Bucket")
           node('builder') {
             sh("ls -lah")
-            repoFunctionsFactory.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,gitlab.infastructure.name, globalValuesFactory.sshDeployGitCredsId)
+            repoFunctionsFactory.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,'custom_dir', globalValuesFactory.sshDeployGitCredsId)
             sh("ls -lah")
           }
           return
