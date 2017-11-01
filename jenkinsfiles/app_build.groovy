@@ -3,7 +3,7 @@ import dvsa.aws.mot.jenkins.pipeline.common.CommonFunctions
 
 def commonFunctionsFactory = new CommonFunctions()
 
-AWS_REGION = 'eu-west-1'
+String aws_region = 'eu-west-1'
 TF_LOG_LEVEL = 'ERROR'
 TF_PROJECT = 'vehicle-recalls'
 BRANCH = params.BRANCH
@@ -208,7 +208,7 @@ node(jenkinsctrl_node_label&&account) {
         colorMapName: 'xterm'
       ]) {
         log_info("Building branch \"${BRANCH}\"")
-        commonFunctionsFactory.bucketExists(bucket)
+        commonFunctionsFactory.bucketExists(bucket,aws_region)
         return
         if (commonFunctionsFactory.bucketExists(bucket) == 1) {
           log_info("Bucket ${bucket} found")
