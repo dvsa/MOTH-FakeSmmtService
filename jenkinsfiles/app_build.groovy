@@ -1,18 +1,40 @@
 @Library('PipelineUtils@master')
-import dvsa.aws.mot.jenkins.pipeline.common.CommonFunctions
+import dvsa.aws.mot.jenkins.pipeline.common.CommonFunctionsAWS
+import dvsa.aws.mot.jenkins.pipeline.common.CommonFunctionsRepo
 
-def commonFunctionsFactory = new CommonFunctions()
+def commonAWSFunctionsFactory = new CommonFunctionsAWS()
+def commontRepoFunctionsFactor = new CommontFunctionsRepo()
+
+String brach = params.BRANCH
+String bucket_prefix = 'uk.gov.dvsa.vehicle-recalls.'
+String bucket = bucket_prefix + env
+
+// This should be a parameter to the pipeline
+String jenkinsctrl_node_label = 'ctrl'
+String account = 'dev'
+String env = 'int'
+
+Map<String, Map<String, String>> gitlab = [
+  infastructure: [
+    group:  'vehicle-recalls',
+    name:   'recalls-infrastructure',
+    branch: branch
+  ]
+]
+
+for (repo in gitlab.keySet()) {
+  if (!gitlab[repo].url) {
+    gitlab[repo].url = "${gitlab_url}:${gitlab[repo].group}/${gitlab[repo].name}.git"
+  }
+}
+
 
 String aws_region = 'eu-west-1'
 TF_LOG_LEVEL = 'ERROR'
 TF_PROJECT = 'vehicle-recalls'
-BRANCH = params.BRANCH
 
-String ENV = 'int'
-String bucket_prefix = 'uk.gov.dvsa.vehicle-recalls.'
-String jenkinsctrl_node_label = 'ctrl'
-String account = 'dev'
-String bucket = bucket_prefix + ENV
+
+
 
 def sh_output(String script) {
   return sh(
@@ -208,16 +230,15 @@ node(jenkinsctrl_node_label&&account) {
         colorMapName: 'xterm'
       ]) {
         log_info("Building branch \"${BRANCH}\"")
-        commonFunctionsFactory.bucketExists(bucket,aws_region,account,build_number)
-
         if (commonFunctionsFactory.bucketExists(bucket,aws_region,account,build_number) == 0) {
           log_info("Bucket ${bucket} found")
-          return
         } else {
           log_info("Bucket ${bucket} not found.")
           log_info("Creating Bucket")
+          commontRepoFunctionsFactor.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,gitlab.infastructure.name)
+          sh("ls -lah")
           return
-          fetch_infrastructure_code()
+          fetch_infrastructure_code(gitlab.infastructure.branch)
 
           extra_args = "-var environment=${ENV} " +
           "-var bucket_prefix=${bucket_prefix}"
