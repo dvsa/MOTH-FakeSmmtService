@@ -9,7 +9,7 @@ TF_PROJECT = 'vehicle-recalls'
 BRANCH = params.BRANCH
 
 String ENV = 'int'
-String BUCKET_PREFIX = 'uk.gov.dvsa.vehicle-recalls.'
+String bucket_prefix = 'uk.gov.dvsa.vehicle-recalls.'
 String jenkinsctrl_node_label = 'ctrl'
 String account = 'dev'
 String bucket = bucket_prefix + ENV
