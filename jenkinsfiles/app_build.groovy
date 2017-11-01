@@ -9,7 +9,7 @@ def globalValuesFactory  = new GlobalValues()
 
 String brach         = params.BRANCH
 String bucket_prefix = 'uk.gov.dvsa.vehicle-recalls.'
-String env                    = 'int'
+String env                    = 'intt'
 String bucket        = bucket_prefix + env
 
 // This should be a parameter to the pipeline
@@ -239,6 +239,7 @@ node(jenkinsctrl_node_label&&account) {
           log_info("Bucket ${bucket} not found.")
           log_info("Creating Bucket")
           node('builder') {
+            sh("ls -lah")
             repoFunctionsFactory.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,gitlab.infastructure.name, globalValuesFactory.sshDeployGitCredsId)
             sh("ls -lah")
           }
