@@ -208,7 +208,9 @@ node(jenkinsctrl_node_label&&account) {
         colorMapName: 'xterm'
       ]) {
         log_info("Building branch \"${BRANCH}\"")
-        if (bucket_exists(bucket) == 1) {
+        commonFunctionsFactory.bucketExists(bucket)
+        return
+        if (commonFunctionsFactory.bucketExists(bucket) == 1) {
           log_info("Bucket ${bucket} found")
         } else {
           log_info("Bucket ${bucket} not found.")
@@ -217,7 +219,6 @@ node(jenkinsctrl_node_label&&account) {
 
           extra_args = "-var environment=${ENV} " +
           "-var bucket_prefix=${bucket_prefix}"
-          return
           tf_scaffold('apply', tf_component, extra_args)
         }
       }
@@ -225,6 +226,7 @@ node(jenkinsctrl_node_label&&account) {
   }
 }
 
+return
 node('builder') {
     fake_smmt_url = build_and_deploy_lambda(
       name: 'Fake SMMT',
