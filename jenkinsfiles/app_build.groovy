@@ -236,8 +236,10 @@ node(jenkinsctrl_node_label&&account) {
         } else {
           log_info("Bucket ${bucket} not found.")
           log_info("Creating Bucket")
-          commontRepoFunctionsFactor.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,gitlab.infastructure.name)
-          sh("ls -lah")
+          node('builder') {
+            commontRepoFunctionsFactor.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,gitlab.infastructure.name)
+            sh("ls -lah")
+          }
           return
           fetch_infrastructure_code(gitlab.infastructure.branch)
 
