@@ -208,7 +208,7 @@ node(jenkinsctrl_node_label&&account) {
         colorMapName: 'xterm'
       ]) {
         log_info("Building branch \"${BRANCH}\"")
-        commonFunctionsFactory.bucketExists(bucket,aws_region)
+        commonFunctionsFactory.bucketExists(bucket,aws_region,account,build_number)
         return
         if (commonFunctionsFactory.bucketExists(bucket) == 1) {
           log_info("Bucket ${bucket} found")
