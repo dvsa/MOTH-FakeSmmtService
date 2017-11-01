@@ -5,13 +5,14 @@ def commonFunctionsFactory = new CommonFunctions()
 
 AWS_REGION = 'eu-west-1'
 TF_LOG_LEVEL = 'ERROR'
-ENV = 'int'
 TF_PROJECT = 'vehicle-recalls'
-BUCKET_PREFIX = 'uk.gov.dvsa.vehicle-recalls.'
 BRANCH = params.BRANCH
 
+String ENV = 'int'
+String BUCKET_PREFIX = 'uk.gov.dvsa.vehicle-recalls.'
 String jenkinsctrl_node_label = 'ctrl'
 String account = 'dev'
+Strimg bucket = bucket_prefix + ENV
 
 def sh_output(String script) {
   return sh(
@@ -33,24 +34,6 @@ def log_info(String info) {
 
 def bucket_exists(String bucket) {
   return sh_status("aws s3 ls s3://${bucket} --region ${AWS_REGION} 2>&1 | grep -q -e \'NoSuchBucket\' -e \'AccessDenied\'")
-}
-
-def verify_or_create_bucket(String bucket_prefix, String tf_component) {
-  node(jenkinsctrl_node_label&&account) {
-    bucket = bucket_prefix + ENV
-    if (bucket_exists(bucket) == 1) {
-      log_info("Bucket ${bucket} found")
-    } else {
-      log_info("Bucket ${bucket} not found.")
-      log_info("Creating Bucket")
-        fetch_infrastructure_code()
-
-        extra_args = "-var environment=${ENV} " +
-          "-var bucket_prefix=${bucket_prefix}"
-
-        tf_scaffold('apply', tf_component, extra_args)
-    }
-  }
 }
 
 def build_and_upload_js(bucket) {
@@ -213,36 +196,47 @@ def build_and_deploy_lambda(params) {
   }
 }
 
-node('builder') {
-  wrap([$class: 'BuildUser']) {
+options {
+  ansiColor('xterm')
+  timestamps()
+  timeout(time: 1, unit: 'HOURS')
+} // options
 
-    wrap([$class: 'TimestamperBuildWrapper']) {
-      wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-          log_info("Building branch \"${BRANCH}\"")
+stage('Verify S3 Bucket') {
+  node(jenkinsctrl_node_label&&account) {
+    log_info("Building branch \"${BRANCH}\"")
+    if (bucket_exists(bucket) == 1) {
+      log_info("Bucket ${bucket} found")
+    } else {
+      log_info("Bucket ${bucket} not found.")
+      log_info("Creating Bucket")
+        fetch_infrastructure_code()
 
-          stage('Verify S3 Bucket') {
-            verify_or_create_bucket(BUCKET_PREFIX, 's3')
-          }
-
-          fake_smmt_url = build_and_deploy_lambda(
-            name: 'Fake SMMT',
-            bucket_prefix: BUCKET_PREFIX,
-            repo: 'vehicle-recalls-fake-smmt-service',
-            tf_component: 'fake_smmt',
-            code_branch: BRANCH
-          )
-
-          build_and_deploy_lambda(
-            name: 'Vehicle Recalls',
-            bucket_prefix: BUCKET_PREFIX,
-            repo: 'vehicle-recalls-api',
-            tf_component: 'vehicle_recalls_api',
-            code_branch: BRANCH,
-            tfvars: [
-              "fake_smmt_url": fake_smmt_url
-            ]
-          )
-        }
-      }
+        extra_args = "-var environment=${ENV} " +
+          "-var bucket_prefix=${bucket_prefix}"
+        return
+        tf_scaffold('apply', tf_component, extra_args)
     }
   }
+}
+
+node('builder') {
+    fake_smmt_url = build_and_deploy_lambda(
+      name: 'Fake SMMT',
+      bucket_prefix: BUCKET_PREFIX,
+      repo: 'vehicle-recalls-fake-smmt-service',
+      tf_component: 'fake_smmt',
+      code_branch: BRANCH
+    )
+
+    build_and_deploy_lambda(
+      name: 'Vehicle Recalls',
+      bucket_prefix: BUCKET_PREFIX,
+      repo: 'vehicle-recalls-api',
+      tf_component: 'vehicle_recalls_api',
+      code_branch: BRANCH,
+      tfvars: [
+        "fake_smmt_url": fake_smmt_url
+      ]
+    )
+}
