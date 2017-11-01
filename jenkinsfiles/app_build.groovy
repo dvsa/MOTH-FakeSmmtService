@@ -226,25 +226,23 @@ stage('Verify S3 Bucket') {
   }
 }
 
-    node('builder') {
-        fake_smmt_url = build_and_deploy_lambda(
-          name: 'Fake SMMT',
-          bucket_prefix: BUCKET_PREFIX,
-          repo: 'vehicle-recalls-fake-smmt-service',
-          tf_component: 'fake_smmt',
-          code_branch: BRANCH
-        )
+node('builder') {
+    fake_smmt_url = build_and_deploy_lambda(
+      name: 'Fake SMMT',
+      bucket_prefix: BUCKET_PREFIX,
+      repo: 'vehicle-recalls-fake-smmt-service',
+      tf_component: 'fake_smmt',
+      code_branch: BRANCH
+    )
 
-        build_and_deploy_lambda(
-          name: 'Vehicle Recalls',
-          bucket_prefix: BUCKET_PREFIX,
-          repo: 'vehicle-recalls-api',
-          tf_component: 'vehicle_recalls_api',
-          code_branch: BRANCH,
-          tfvars: [
-            "fake_smmt_url": fake_smmt_url
-          ]
-        )
-    }
-  }
+    build_and_deploy_lambda(
+      name: 'Vehicle Recalls',
+      bucket_prefix: BUCKET_PREFIX,
+      repo: 'vehicle-recalls-api',
+      tf_component: 'vehicle_recalls_api',
+      code_branch: BRANCH,
+      tfvars: [
+        "fake_smmt_url": fake_smmt_url
+      ]
+    )
 }
