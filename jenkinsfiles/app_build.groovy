@@ -233,7 +233,9 @@ node(jenkinsctrl_node_label&&account) {
 
           extra_args = "-var environment=${env} " +
           "-var bucket_prefix=${bucket_prefix}"
-          awsFunctionsFactory.terraformScaffold(project, env, account, globalValuesFactory.AWS_REGION, null, 'terraform_plan', build_number, 's3', bucket_prefix, 'plan')
+          dir('custom_dir') {
+            awsFunctionsFactory.terraformScaffold(project, env, account, globalValuesFactory.AWS_REGION, null, 'terraform_plan', build_number, 's3', bucket_prefix, 'plan')
+          }
           // tf_scaffold('plan', tf_component, extra_args)
           return
         }
