@@ -198,16 +198,15 @@ def build_and_deploy_lambda(params) {
 
 
 
-
-stage('Verify S3 Bucket') {
-  wrap([
-    $class: 'TimestamperBuildWrapper'
-  ]) {
+node(jenkinsctrl_node_label&&account) {
+  stage('Verify S3 Bucket') {
     wrap([
-      $class:       'AnsiColorBuildWrapper',
-      colorMapName: 'xterm'
+      $class: 'TimestamperBuildWrapper'
     ]) {
-      node(jenkinsctrl_node_label&&account) {
+      wrap([
+        $class:       'AnsiColorBuildWrapper',
+        colorMapName: 'xterm'
+      ]) {
         log_info("Building branch \"${BRANCH}\"")
         if (bucket_exists(bucket) == 1) {
           log_info("Bucket ${bucket} found")
