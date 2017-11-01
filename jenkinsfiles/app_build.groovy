@@ -2,22 +2,23 @@
 import dvsa.aws.mot.jenkins.pipeline.common.CommonFunctionsAWS
 import dvsa.aws.mot.jenkins.pipeline.common.CommonFunctionsRepo
 
-def commonAWSFunctionsFactory = new CommonFunctionsAWS()
+def commonAWSFunctionsFactory  = new CommonFunctionsAWS()
 def commontRepoFunctionsFactor = new CommonFunctionsRepo()
 
-String brach = params.BRANCH
+String brach         = params.BRANCH
 String bucket_prefix = 'uk.gov.dvsa.vehicle-recalls.'
-String bucket = bucket_prefix + env
+String bucket        = bucket_prefix + env
+String gitlab_url    = 'git@gitlab.motdev.org.uk'
 
 // This should be a parameter to the pipeline
 String jenkinsctrl_node_label = 'ctrl'
-String account = 'dev'
-String env = 'int'
+String account                = 'dev'
+String env                    = 'int'
 
 Map<String, Map<String, String>> gitlab = [
   infastructure: [
-    group:  'vehicle-recalls',
-    name:   'recalls-infrastructure',
+    group: 'vehicle-recalls',
+    name: 'recalls-infrastructure',
     branch: branch
   ]
 ]
