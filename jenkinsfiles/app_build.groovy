@@ -209,12 +209,14 @@ node(jenkinsctrl_node_label&&account) {
       ]) {
         log_info("Building branch \"${BRANCH}\"")
         commonFunctionsFactory.bucketExists(bucket,aws_region,account,build_number)
-        return
-        if (commonFunctionsFactory.bucketExists(bucket) == 1) {
+
+        if (commonFunctionsFactory.bucketExists(bucket,aws_region,account,build_number)) {
           log_info("Bucket ${bucket} found")
+          return
         } else {
           log_info("Bucket ${bucket} not found.")
           log_info("Creating Bucket")
+          return
           fetch_infrastructure_code()
 
           extra_args = "-var environment=${ENV} " +
