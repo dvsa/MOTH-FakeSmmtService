@@ -236,7 +236,7 @@ def build_and_deploy_lambda(params) {
   stage('Build ' + name) {
     sh("ls -lah")
     sh("rm -rf \"${repo}\"")
-    repoFunctionsFactory.checkoutGitRepo(
+    repoFunctionsFactoryParam.checkoutGitRepo(
       github.fake_smmt.url,
       github.fake_smmt.branch,
       github.fake_smmt.name, // We will agree together on the naming - probably we will use gitlab.infastructure.name
@@ -311,7 +311,7 @@ node('builder') {
       repo: 'vehicle-recalls-fake-smmt-service',
       tf_component: 'fake_smmt',
       code_branch: BRANCH
-      repoFunctionsFactory: repoFunctionsFactory
+      repoFunctionsFactoryParam: repoFunctionsFactory
     )
     return
     build_and_deploy_lambda(
