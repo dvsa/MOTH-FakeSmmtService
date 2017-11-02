@@ -310,7 +310,7 @@ node('builder') {
       bucket_prefix: BUCKET_PREFIX,
       repo: 'vehicle-recalls-fake-smmt-service',
       tf_component: 'fake_smmt',
-      code_branch: BRANCH
+      code_branch: BRANCH,
       repoFunctionsFactoryParam: repoFunctionsFactory
     )
     return
