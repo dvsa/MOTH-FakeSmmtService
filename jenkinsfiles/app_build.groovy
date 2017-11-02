@@ -7,16 +7,16 @@ def awsFunctionsFactory  = new AWSFunctions()
 def repoFunctionsFactory = new RepoFunctions()
 def globalValuesFactory  = new GlobalValues()
 
-String brach         = params.BRANCH
-String bucket_prefix = 'terraformscaffold'
-String env                    = 'int'
-String bucket        = bucket_prefix + env
-
 // This should be a parameter to the pipeline
 String jenkinsctrl_node_label = 'ctrl'
 String account                = 'dev'
 String project                = 'vehicle-recalls'
+String env                    = 'int'
+String brach                  = params.BRANCH
 
+// Pipeline specific data
+String bucket        = bucket_prefix + env
+String bucket_prefix = 'terraformscaffold'
 
 Map<String, Map<String, String>> gitlab = [
   infastructure: [
@@ -46,12 +46,10 @@ for (repo in github.keySet()) {
   }
 }
 
-
+// TODO Remove this after rework.
 TF_LOG_LEVEL = 'ERROR'
 TF_PROJECT = 'vehicle-recalls'
 BUCKET_PREFIX = 'uk.gov.dvsa.vehicle-recalls.'
-
-
 
 def sh_output(String script) {
   return sh(
@@ -193,7 +191,8 @@ def build_and_deploy_lambda(params) {
   String tf_component = params.tf_component
   String code_branch = params.code_branch
   String bucket_prefix = params.bucket_prefix
-  String bucket = bucket_prefix + ENV
+  String bucket = bucket_prefix + env
+  tfvars = params.tfvars
   log_info("========================")
   log_info("name: ${name}")
   log_info("repo: ${repo}")
@@ -201,20 +200,22 @@ def build_and_deploy_lambda(params) {
   log_info("code_branch: ${code_branch}")
   log_info("bucket_prefix: ${bucket_prefix}")
   log_info("bucket: ${bucket}")
+  log_info("tfvars: ${tfvars}")
   log_info("========================")
-  return
-  tfvars = params.tfvars
+
+
   dist = ''
 
   stage('Build ' + name) {
+    sh("ls -lah")
+    return
     sh("rm -rf \"${repo}\"")
-
     checkout_github_repo_branch_or_master("dvsa", repo, code_branch)
     dir(repo) {
       dist = build_and_upload_js(bucket)
     }
   }
-
+  return
   stage('TF Plan & Apply ' + name) {
     node('ctrl' && 'dev') {
       get_tfenv()
