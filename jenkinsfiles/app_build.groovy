@@ -218,6 +218,7 @@ def build_and_deploy_lambda(params) {
   String code_branch = params.code_branch
   String bucket_prefix = params.bucket_prefix
   String bucket = bucket_prefix + env
+  def repoFunctionsFactory = params.repoFunctionsFactory
   tfvars = params.tfvars
   log_info("========================")
   log_info("name: ${name}")
@@ -310,6 +311,7 @@ node('builder') {
       repo: 'vehicle-recalls-fake-smmt-service',
       tf_component: 'fake_smmt',
       code_branch: BRANCH
+      repoFunctionsFactory: repoFunctionsFactory
     )
     return
     build_and_deploy_lambda(
