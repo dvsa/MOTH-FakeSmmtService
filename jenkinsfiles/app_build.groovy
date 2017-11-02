@@ -219,8 +219,8 @@ def build_and_deploy_lambda(params) {
   String code_branch = params.code_branch
   String bucket_prefix = params.bucket_prefix
   String bucket = bucket_prefix + env
-  def repoFunctions = params.repoFunctions
-  def globalValues = params.globalValues
+  def repoFunctionsFactory = params.repoFunctionsFactory
+  def globalValuesFactory = params.globalValuesFactory
   def github = params.github
   tfvars = params.tfvars
   log_info("========================")
@@ -239,7 +239,7 @@ def build_and_deploy_lambda(params) {
   stage('Build ' + name) {
     sh("ls -lah")
     sh("rm -rf \"${repo}\"")
-    repoFunctions.checkoutGitRepo(
+    repoFunctionsFactory.checkoutGitRepo(
       github.fake_smmt.url,
       github.fake_smmt.branch,
       github.fake_smmt.name, // We will agree together on the naming - probably we will use gitlab.infastructure.name
@@ -315,8 +315,8 @@ node('builder') {
       repo: github.fake_smmt.name,
       tf_component: 'fake_smmt',
       code_branch: brach,
-      repoFunctions: repoFunctionsFactory,
-      globalValues: globalValuesFactory,
+      repoFunctionsFactory: repoFunctionsFactory,
+      globalValuesFactory: globalValuesFactory,
       github: github
     )
     return
