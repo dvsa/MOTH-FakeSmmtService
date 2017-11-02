@@ -15,8 +15,9 @@ String env                    = 'int'
 String brach                  = params.BRANCH
 
 // Pipeline specific data
-String bucket        = bucket_prefix + env
 String bucket_prefix = 'terraformscaffold'
+String bucket        = bucket_prefix + env
+
 
 Map<String, Map<String, String>> gitlab = [
   infastructure: [
