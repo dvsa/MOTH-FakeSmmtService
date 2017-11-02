@@ -245,10 +245,11 @@ def build_and_deploy_lambda(params) {
       globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
     )
     sh("ls -lah")
-    return
+
     dir(github.fake_smmt.name) {
       dist = build_and_upload_js(bucket)
     }
+    return
   }
   return
   stage('TF Plan & Apply ' + name) {
@@ -313,7 +314,7 @@ node('builder') {
       repo: github.fake_smmt.name,
       tf_component: 'fake_smmt',
       code_branch: brach,
-      repoFunctions: repoFunctionsFactory
+      repoFunctions: repoFunctionsFactory,
       globalValues: globalValuesFactory
     )
     return
