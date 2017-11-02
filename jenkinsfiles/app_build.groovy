@@ -221,6 +221,7 @@ def build_and_deploy_lambda(params) {
   String bucket = bucket_prefix + env
   def repoFunctions = params.repoFunctions
   def globalValues = params.globalValues
+  def github = params.github
   tfvars = params.tfvars
   log_info("========================")
   log_info("name: ${name}")
@@ -316,6 +317,7 @@ node('builder') {
       code_branch: brach,
       repoFunctions: repoFunctionsFactory,
       globalValues: globalValuesFactory
+      github: github
     )
     return
     build_and_deploy_lambda(
