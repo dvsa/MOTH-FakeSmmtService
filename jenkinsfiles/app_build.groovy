@@ -241,7 +241,7 @@ def build_and_deploy_lambda(params) {
     sh("rm -rf \"${repo}\"")
     repoFunctionsFactory.checkoutGitRepo(
       github.fake_smmt.url,
-      github.fake_smmt.branch,
+      'master', // Change that to branch after tests
       github.fake_smmt.name, // We will agree together on the naming - probably we will use gitlab.infastructure.name
       globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
     )
