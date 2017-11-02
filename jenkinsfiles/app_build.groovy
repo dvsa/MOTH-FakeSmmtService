@@ -238,7 +238,7 @@ def build_and_deploy_lambda(params) {
   stage('Build ' + name) {
     sh("ls -lah")
     sh("rm -rf \"${repo}\"")
-    repoFunctionsFactoryParam.checkoutGitRepo(
+    repoFunctions.checkoutGitRepo(
       github.fake_smmt.url,
       github.fake_smmt.branch,
       github.fake_smmt.name, // We will agree together on the naming - probably we will use gitlab.infastructure.name
