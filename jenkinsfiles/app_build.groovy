@@ -26,11 +26,26 @@ Map<String, Map<String, String>> gitlab = [
   ]
 ]
 
+Map<String, Map<String, String>> github = [
+  fake_smmt: [
+    group: 'dvsa',
+    name: 'vehicle-recalls-fake-smmt-service',
+    branch: branch
+  ]
+]
+
 for (repo in gitlab.keySet()) {
   if (!gitlab[repo].url) {
     gitlab[repo].url = "${globalValuesFactory.GITLAB_URL}:${gitlab[repo].group}/${gitlab[repo].name}.git"
   }
 }
+
+for (repo in github.keySet()) {
+  if (!github[repo].url) {
+    github[repo].url = "https://github.com/${github[repo].group}/${github[repo].name}.git"
+  }
+}
+
 
 TF_LOG_LEVEL = 'ERROR'
 TF_PROJECT = 'vehicle-recalls'
@@ -179,6 +194,15 @@ def build_and_deploy_lambda(params) {
   String code_branch = params.code_branch
   String bucket_prefix = params.bucket_prefix
   String bucket = bucket_prefix + ENV
+  log_info("========================")
+  log_info("name: ${name}")
+  log_info("repo: ${repo}")
+  log_info("tf_component: ${tf_component}")
+  log_info("code_branch: ${code_branch}")
+  log_info("bucket_prefix: ${bucket_prefix}")
+  log_info("bucket: ${bucket}")
+  log_info("========================")
+  return
   tfvars = params.tfvars
   dist = ''
 
@@ -211,8 +235,6 @@ def build_and_deploy_lambda(params) {
   }
 }
 
-
-
 node(jenkinsctrl_node_label&&account) {
   stage('Verify S3 Bucket') {
     wrap([
@@ -229,23 +251,19 @@ node(jenkinsctrl_node_label&&account) {
           log_info("Bucket ${bucket} not found.")
           log_info("Creating Bucket")
 
-
-
-          extra_args = "-var environment=${env} " +
-          "-var bucket_prefix=${bucket_prefix}"
+          repoFunctionsFactory.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,'custom_dir', globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID)
+          dir('custom_dir') {
+            // TODO change plan to apply and remove everything else
+            awsFunctionsFactory.terraformScaffold(project, env, account, globalValuesFactory.AWS_REGION, '', 'terraform_plan', build_number, 's3', bucket_prefix, 'plan')
+          }
         }
-        repoFunctionsFactory.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,'custom_dir', globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID)
-        dir('custom_dir') {
-          awsFunctionsFactory.terraformScaffold(project, env, account, globalValuesFactory.AWS_REGION, '', 'terraform_plan', build_number, 's3', bucket_prefix, 'plan')
-        }
-        return
       }
     }
   }
 }
 
-return
 node('builder') {
+
     fake_smmt_url = build_and_deploy_lambda(
       name: 'Fake SMMT',
       bucket_prefix: BUCKET_PREFIX,
@@ -253,7 +271,7 @@ node('builder') {
       tf_component: 'fake_smmt',
       code_branch: BRANCH
     )
-
+    return
     build_and_deploy_lambda(
       name: 'Vehicle Recalls',
       bucket_prefix: BUCKET_PREFIX,
