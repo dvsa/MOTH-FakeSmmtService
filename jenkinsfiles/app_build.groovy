@@ -98,12 +98,11 @@ def verify_or_create_bucket(String bucket_prefix, String tf_component) {
 def build_and_upload_js(bucket) {
   dir("app") {
     sh("ls -lah")
-    sh("npm install")
-    sh("npm run build")
-    return
+    // sh("npm install")
+    // sh("npm run build")
     dir("dist") {
       sh("ls -lah")
-
+      return
       def dist_files = sh_output("ls | wc -l").toInteger()
       log_info("$dist_files files in dist")
 
@@ -119,7 +118,7 @@ def build_and_upload_js(bucket) {
       copy_file_to_s3(dist_file, bucket)
     }
   }
-
+  return
   return dist_file
 }
 
