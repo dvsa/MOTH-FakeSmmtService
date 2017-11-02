@@ -244,18 +244,10 @@ node(jenkinsctrl_node_label&&account) {
         $class:       'AnsiColorBuildWrapper',
         colorMapName: 'xterm'
       ]) {
-        log_info("Building branch \"${BRANCH}\"")
-        if (awsFunctionsFactory.bucketExists(bucket, globalValuesFactory.AWS_REGION, account, build_number)) {
-          log_info("Bucket ${bucket} found")
-        } else {
-          log_info("Bucket ${bucket} not found.")
-          log_info("Creating Bucket")
-
-          repoFunctionsFactory.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,'custom_dir', globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID)
-          dir('custom_dir') {
-            // TODO change plan to apply and remove everything else
+          repoFunctionsFactory.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,'infrastructure_dir', globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID)
+          dir('infrastructure_dir') {
+            // When devs agree on this change we will change plan to apply.
             awsFunctionsFactory.terraformScaffold(project, env, account, globalValuesFactory.AWS_REGION, '', 'terraform_plan', build_number, 's3', bucket_prefix, 'plan')
-          }
         }
       }
     }
