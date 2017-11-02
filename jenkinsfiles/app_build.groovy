@@ -218,7 +218,7 @@ def build_and_deploy_lambda(params) {
   String code_branch = params.code_branch
   String bucket_prefix = params.bucket_prefix
   String bucket = bucket_prefix + env
-  def repoFunctionsFactory = params.repoFunctionsFactory
+  def repoFunctionsFactoryParam = params.repoFunctionsFactory
   tfvars = params.tfvars
   log_info("========================")
   log_info("name: ${name}")
