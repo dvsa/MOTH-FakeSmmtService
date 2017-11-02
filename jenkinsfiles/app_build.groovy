@@ -316,7 +316,7 @@ node('builder') {
       tf_component: 'fake_smmt',
       code_branch: brach,
       repoFunctions: repoFunctionsFactory,
-      globalValues: globalValuesFactory
+      globalValues: globalValuesFactory,
       github: github
     )
     return
