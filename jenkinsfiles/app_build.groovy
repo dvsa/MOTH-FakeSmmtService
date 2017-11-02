@@ -234,8 +234,14 @@ def build_and_deploy_lambda(params) {
 
   stage('Build ' + name) {
     sh("ls -lah")
-    return
     sh("rm -rf \"${repo}\"")
+    repoFunctionsFactory.checkoutGitRepo(
+      github.fake_smmt.url,
+      gitlab.fake_smmt.branch,
+      gitlab.fake_smmt.name, // We will agree together on the naming - probably we will use gitlab.infastructure.name
+      null
+    )
+    return
     checkout_github_repo_branch_or_master("dvsa", repo, code_branch)
     dir(repo) {
       dist = build_and_upload_js(bucket)
@@ -274,10 +280,10 @@ node(jenkinsctrl_node_label&&account) {
           repoFunctionsFactory.checkoutGitRepo(
             gitlab.infastructure.url,
             gitlab.infastructure.branch,
-            'infrastructure_dir', // We will agree together on the naming - probably we will use gitlab.infastructure.name
+            gitlab.infastructure.name,
             globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
           )
-          dir('infrastructure_dir') { // We will agree together on the naming - probably we will use gitlab.infastructure.name
+          dir(gitlab.infastructure.name) {
             awsFunctionsFactory.terraformScaffold(
               project,
               env,
