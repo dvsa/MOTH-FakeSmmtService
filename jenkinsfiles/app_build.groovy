@@ -96,11 +96,11 @@ def verify_or_create_bucket(String bucket_prefix, String tf_component) {
 }
 
 def build_and_upload_js(bucket) {
-  return
   dir("app") {
+    sh("ls -lah")
     sh("npm install")
     sh("npm run build")
-
+    return
     dir("dist") {
       sh("ls -lah")
 
@@ -237,16 +237,12 @@ def build_and_deploy_lambda(params) {
   dist = ''
 
   stage('Build ' + name) {
-    sh("ls -lah")
-    sh("rm -rf \"${repo}\"")
     repoFunctionsFactory.checkoutGitRepo(
       github.fake_smmt.url,
       'master', // Change that to branch after tests
       github.fake_smmt.name, // We will agree together on the naming - probably we will use gitlab.infastructure.name
       globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
     )
-    sh("ls -lah")
-
     dir(github.fake_smmt.name) {
       dist = build_and_upload_js(bucket)
     }
