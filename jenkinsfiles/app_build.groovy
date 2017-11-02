@@ -220,7 +220,7 @@ def build_and_deploy_lambda(params) {
   String code_branch = params.code_branch
   String bucket_prefix = params.bucket_prefix
   String bucket = bucket_prefix + env
-  String timestamp params.timestamp
+  String timestamp = params.timestamp
   def repoFunctionsFactory = params.repoFunctionsFactory
   def globalValuesFactory = params.globalValuesFactory
   def github = params.github
