@@ -229,13 +229,14 @@ node(jenkinsctrl_node_label&&account) {
           log_info("Bucket ${bucket} not found.")
           log_info("Creating Bucket")
 
-          repoFunctionsFactory.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,'custom_dir', globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID)
+
 
           extra_args = "-var environment=${env} " +
           "-var bucket_prefix=${bucket_prefix}"
         }
+        repoFunctionsFactory.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,'custom_dir', globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID)
         dir('custom_dir') {
-          awsFunctionsFactory.terraformScaffold(project, env, account, globalValuesFactory.AWS_REGION, null, 'terraform_plan', build_number, 's3', bucket_prefix, 'plan')
+          awsFunctionsFactory.terraformScaffold(project, env, account, globalValuesFactory.AWS_REGION, '', 'terraform_plan', build_number, 's3', bucket_prefix, 'plan')
         }
         return
       }
