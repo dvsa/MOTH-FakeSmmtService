@@ -9,7 +9,7 @@ def globalValuesFactory  = new GlobalValues()
 
 String brach         = params.BRANCH
 String bucket_prefix = 'uk.gov.dvsa.vehicle-recalls.'
-String env                    = 'intt'
+String env                    = 'int'
 String bucket        = bucket_prefix + env
 
 // This should be a parameter to the pipeline
@@ -233,12 +233,11 @@ node(jenkinsctrl_node_label&&account) {
 
           extra_args = "-var environment=${env} " +
           "-var bucket_prefix=${bucket_prefix}"
-          dir('custom_dir') {
-            awsFunctionsFactory.terraformScaffold(project, env, account, globalValuesFactory.AWS_REGION, null, 'terraform_plan', build_number, 's3', bucket_prefix, 'plan')
-          }
-          // tf_scaffold('plan', tf_component, extra_args)
-          return
         }
+        dir('custom_dir') {
+          awsFunctionsFactory.terraformScaffold(project, env, account, globalValuesFactory.AWS_REGION, null, 'terraform_plan', build_number, 's3', bucket_prefix, 'plan')
+        }
+        return
       }
     }
   }
