@@ -97,11 +97,11 @@ def verify_or_create_bucket(String bucket_prefix, String tf_component) {
   }
 }
 
-def build_and_upload_js(bucket) {
+def build_and_upload_js(bucket,timestamp) {
   dir("app") {
     sh("ls -lah")
-    // sh("npm install")
-    // sh("npm run build")
+    sh("npm install")
+    sh("BUILDSTAMP=${timestamp} npm run build")
     dir("dist") {
       sh("ls -lah")
       return
@@ -245,7 +245,7 @@ def build_and_deploy_lambda(params) {
       globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
     )
     dir(github.fake_smmt.name) {
-      dist = build_and_upload_js(bucket)
+      dist = build_and_upload_js(bucket, timestamp)
     }
     return
   }
@@ -305,7 +305,6 @@ node(jenkinsctrl_node_label&&account) {
   }
 
 node('builder') {
-    log_info(" ===========      ${timestamp} =====")
     fake_smmt_url = build_and_deploy_lambda(
       name: 'Fake SMMT',
       bucket_prefix: bucket_prefix,
@@ -314,7 +313,8 @@ node('builder') {
       code_branch: brach,
       repoFunctionsFactory: repoFunctionsFactory,
       globalValuesFactory: globalValuesFactory,
-      github: github
+      github: github,
+      timestamp: timestamp
     )
     return
     build_and_deploy_lambda(
