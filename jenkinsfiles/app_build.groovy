@@ -49,7 +49,7 @@ for (repo in github.keySet()) {
 
 TF_LOG_LEVEL = 'ERROR'
 TF_PROJECT = 'vehicle-recalls'
-
+BUCKET_PREFIX = 'uk.gov.dvsa.vehicle-recalls.'
 
 
 
