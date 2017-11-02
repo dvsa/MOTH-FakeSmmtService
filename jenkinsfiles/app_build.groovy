@@ -8,7 +8,7 @@ def repoFunctionsFactory = new RepoFunctions()
 def globalValuesFactory  = new GlobalValues()
 
 String brach         = params.BRANCH
-String bucket_prefix = 'uk.gov.dvsa.vehicle-recalls.'
+String bucket_prefix = 'terraformscaffold'
 String env                    = 'int'
 String bucket        = bucket_prefix + env
 
