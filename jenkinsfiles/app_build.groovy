@@ -239,8 +239,7 @@ def build_and_deploy_lambda(params) {
       github.fake_smmt.url,
       github.fake_smmt.branch,
       github.fake_smmt.name, // We will agree together on the naming - probably we will use gitlab.infastructure.name
-      // globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
-      null
+      globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
     )
     return
     checkout_github_repo_branch_or_master("dvsa", repo, code_branch)
