@@ -7,6 +7,7 @@ def awsFunctionsFactory  = new AWSFunctions()
 def repoFunctionsFactory = new RepoFunctions()
 def globalValuesFactory  = new GlobalValues()
 
+
 // This should be a parameter to the pipeline
 String jenkinsctrl_node_label = 'ctrl'
 String account                = 'dev'
@@ -17,6 +18,7 @@ String brach                  = params.BRANCH
 // Pipeline specific data
 String bucket_prefix = 'terraformscaffold'
 String bucket        = bucket_prefix + env
+Long timestamp       = new Date().getTime()
 
 
 Map<String, Map<String, String>> gitlab = [
@@ -303,7 +305,7 @@ node(jenkinsctrl_node_label&&account) {
   }
 
 node('builder') {
-
+    log_info(" ===========      ${timestamp} =====")
     fake_smmt_url = build_and_deploy_lambda(
       name: 'Fake SMMT',
       bucket_prefix: bucket_prefix,
