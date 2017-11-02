@@ -244,15 +244,30 @@ node(jenkinsctrl_node_label&&account) {
         $class:       'AnsiColorBuildWrapper',
         colorMapName: 'xterm'
       ]) {
-          repoFunctionsFactory.checkoutGitRepo(gitlab.infastructure.url,gitlab.infastructure.branch,'infrastructure_dir', globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID)
-          dir('infrastructure_dir') {
-            // When devs agree on this change we will change plan to apply.
-            awsFunctionsFactory.terraformScaffold(project, env, account, globalValuesFactory.AWS_REGION, '', 'terraform_plan', build_number, 's3', bucket_prefix, 'plan')
+          repoFunctionsFactory.checkoutGitRepo(
+            gitlab.infastructure.url,
+            gitlab.infastructure.branch,
+            'infrastructure_dir', // We will agree together on the naming - probably we will use gitlab.infastructure.name
+            globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
+          )
+          dir('infrastructure_dir') { // We will agree together on the naming - probably we will use gitlab.infastructure.name
+            awsFunctionsFactory.terraformScaffold(
+              project,
+              env,
+              account,
+              globalValuesFactory.AWS_REGION,
+              '',    // I'm not passing any extra args - lets keep this generic
+              'terraform_plan',
+              build_number,
+              's3',
+              bucket_prefix,
+              'plan' // When devs agree on this change we will change plan to apply.
+            )
+          }
         }
       }
     }
   }
-}
 
 node('builder') {
 
