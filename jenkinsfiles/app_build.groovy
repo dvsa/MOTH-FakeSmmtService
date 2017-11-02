@@ -96,6 +96,7 @@ def verify_or_create_bucket(String bucket_prefix, String tf_component) {
 }
 
 def build_and_upload_js(bucket) {
+  return
   dir("app") {
     sh("npm install")
     sh("npm run build")
@@ -218,7 +219,8 @@ def build_and_deploy_lambda(params) {
   String code_branch = params.code_branch
   String bucket_prefix = params.bucket_prefix
   String bucket = bucket_prefix + env
-  def repoFunctionsFactoryParam = params.repoFunctionsFactory
+  def repoFunctions = params.repoFunctions
+  def globalValues = params.globalValues
   tfvars = params.tfvars
   log_info("========================")
   log_info("name: ${name}")
@@ -244,8 +246,7 @@ def build_and_deploy_lambda(params) {
     )
     sh("ls -lah")
     return
-    checkout_github_repo_branch_or_master("dvsa", repo, code_branch)
-    dir(repo) {
+    dir(github.fake_smmt.name) {
       dist = build_and_upload_js(bucket)
     }
   }
@@ -308,11 +309,12 @@ node('builder') {
 
     fake_smmt_url = build_and_deploy_lambda(
       name: 'Fake SMMT',
-      bucket_prefix: BUCKET_PREFIX,
-      repo: 'vehicle-recalls-fake-smmt-service',
+      bucket_prefix: bucket_prefix,
+      repo: github.fake_smmt.name,
       tf_component: 'fake_smmt',
-      code_branch: BRANCH,
-      repoFunctionsFactoryParam: repoFunctionsFactory
+      code_branch: brach,
+      repoFunctions: repoFunctionsFactory
+      globalValues: globalValuesFactory
     )
     return
     build_and_deploy_lambda(
