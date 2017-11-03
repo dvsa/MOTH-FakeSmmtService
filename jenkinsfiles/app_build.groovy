@@ -12,14 +12,13 @@ def globalValuesFactory  = new GlobalValues()
 String jenkinsctrl_node_label = 'ctrl'
 String account                = 'dev'
 String project                = 'vehicle-recalls'
-String env                    = 'int'
+String environment            = 'int'
 String brach                  = params.BRANCH
+String timestamp              = env.BUILD_NUMBER
 
 // Pipeline specific data
 String bucket_prefix = 'terraformscaffold'
-String bucket        = bucket_prefix + env
-Long timestamp       = new Date().getTime()
-
+String bucket        = bucket_prefix + environment
 
 Map<String, Map<String, String>> gitlab = [
   infastructure: [
@@ -219,7 +218,7 @@ def build_and_deploy_lambda(params) {
   String tf_component = params.tf_component
   String code_branch = params.code_branch
   String bucket_prefix = params.bucket_prefix
-  String bucket = bucket_prefix + env
+  String bucket = bucket_prefix + environment
   String timestamp = params.timestamp
   def repoFunctionsFactory = params.repoFunctionsFactory
   def globalValuesFactory = params.globalValuesFactory
@@ -289,7 +288,7 @@ node(jenkinsctrl_node_label&&account) {
           dir(gitlab.infastructure.name) {
             awsFunctionsFactory.terraformScaffold(
               project,
-              env,
+              environment,
               account,
               globalValuesFactory.AWS_REGION,
               '',    // I'm not passing any extra args - lets keep this generic
