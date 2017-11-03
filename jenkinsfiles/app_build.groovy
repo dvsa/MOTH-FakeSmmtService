@@ -139,10 +139,10 @@ def build_and_upload_js(bucket,build_id) {
       dist_file = sh_output("ls")
       copy_file_to_s3(dist_file, bucket)
     }
+    return
+    return dist_file
   }
-  return
-  return dist_file
-}
+
 
 def abort_build(String message) {
   currentBuild.result = 'ABORTED'
