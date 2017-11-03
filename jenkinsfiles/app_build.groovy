@@ -298,7 +298,7 @@ node(jenkinsctrl_node_label&&account) {
               build_number,
               's3',
               bucket_prefix,
-              'plan' // When devs agree on this change we will change plan to apply.
+              'apply' // When devs agree on this change we will change plan to apply.
             )
           }
         }
