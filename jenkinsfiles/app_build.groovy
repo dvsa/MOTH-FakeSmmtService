@@ -122,7 +122,7 @@ def build_and_upload_js(bucket,build_id) {
     dir('app'){
       sh("ls -lah")
     }
-    dir("dist") {
+    dir("app/dist") {
       sh("ls -lah")
 
       def dist_files = sh_output("find . -type f -name \'fakeSmmtService-*.zip\'| wc -l").toInteger()
