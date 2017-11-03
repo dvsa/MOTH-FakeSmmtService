@@ -9,10 +9,12 @@ def globalValuesFactory  = new GlobalValues()
 
 
 // This should be a parameter to the pipeline
-String jenkinsctrl_node_label = 'ctrl'
-String account                = 'dev'
-String project                = 'vehicle-recalls'
 String environment            = 'int'
+String account                = 'dev'
+
+// Static stuff
+String project                = 'vehicle-recalls'
+String jenkinsctrl_node_label = 'ctrl'
 String brach                  = params.BRANCH
 String timestamp              = env.BUILD_NUMBER
 
@@ -311,6 +313,7 @@ node('builder') {
       repo: github.fake_smmt.name,
       tf_component: 'fake_smmt',
       code_branch: brach,
+      environment: environment,
       repoFunctionsFactory: repoFunctionsFactory,
       globalValuesFactory: globalValuesFactory,
       github: github,
@@ -319,6 +322,7 @@ node('builder') {
     return
     build_and_deploy_lambda(
       name: 'Vehicle Recalls',
+      environment: environment,
       bucket_prefix: BUCKET_PREFIX,
       repo: 'vehicle-recalls-api',
       tf_component: 'vehicle_recalls_api',
