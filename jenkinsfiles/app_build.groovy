@@ -116,8 +116,8 @@ Boolean buildNPM(
 
 def build_and_upload_js(bucket,build_id) {
     buildNPM(
-      directory: 'app',
-      buildStamp: build_id
+      'app',
+      build_id
     )
     dir('app'){
       sh("ls -lah")
