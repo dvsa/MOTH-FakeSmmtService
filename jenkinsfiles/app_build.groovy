@@ -105,10 +105,10 @@ def build_and_upload_js(bucket,build_id) {
     sh("BUILDSTAMP=${build_id} npm run build")
     dir("dist") {
       sh("ls -lah")
-      return
+
       def dist_files = sh_output("ls | wc -l").toInteger()
       log_info("$dist_files files in dist")
-
+      return
       if (dist_files == 0) {
         abort_build("Dist file not found, aborting")
       }
