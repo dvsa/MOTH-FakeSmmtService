@@ -16,7 +16,7 @@ String account                = 'dev'
 String project                = 'vehicle-recalls'
 String jenkinsctrl_node_label = 'ctrl'
 String brach                  = params.BRANCH
-String timestamp              = env.BUILD_NUMBER
+String build_id              = env.BUILD_NUMBER
 
 // Pipeline specific data
 String bucket_prefix = 'terraformscaffold'
@@ -98,11 +98,11 @@ def verify_or_create_bucket(String bucket_prefix, String tf_component) {
   }
 }
 
-def build_and_upload_js(bucket,timestamp) {
+def build_and_upload_js(bucket,build_id) {
   dir("app") {
     sh("ls -lah")
     sh("npm install")
-    sh("BUILDSTAMP=${timestamp} npm run build")
+    sh("BUILDSTAMP=${build_id} npm run build")
     dir("dist") {
       sh("ls -lah")
       return
@@ -221,7 +221,7 @@ def build_and_deploy_lambda(params) {
   String code_branch = params.code_branch
   String bucket_prefix = params.bucket_prefix
   String bucket = bucket_prefix + params.environment
-  String timestamp = params.timestamp
+  String build_id = params.build_id
   def repoFunctionsFactory = params.repoFunctionsFactory
   def globalValuesFactory = params.globalValuesFactory
   def github = params.github
@@ -247,7 +247,7 @@ def build_and_deploy_lambda(params) {
       globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
     )
     dir(github.fake_smmt.name) {
-      dist = build_and_upload_js(bucket, timestamp)
+      dist = build_and_upload_js(bucket, build_id)
     }
     return
   }
@@ -317,7 +317,7 @@ node('builder') {
       repoFunctionsFactory: repoFunctionsFactory,
       globalValuesFactory: globalValuesFactory,
       github: github,
-      timestamp: timestamp
+      build_id: build_id
     )
     return
     build_and_deploy_lambda(
