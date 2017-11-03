@@ -98,15 +98,34 @@ def verify_or_create_bucket(String bucket_prefix, String tf_component) {
   }
 }
 
+Boolean buildNPM(
+  String directory,
+  String buildStamp
+){
+  dir(directory) {
+    Integer status = sh(
+      script: """
+        npm install
+        BUILDSTAMP=${buildStamp} npm run build
+      """,
+      returnStatus: true
+    )
+    return status
+  }
+}
+
 def build_and_upload_js(bucket,build_id) {
-  dir("app") {
-    sh("ls -lah")
-    sh("npm install")
-    sh("BUILDSTAMP=${build_id} npm run build")
+    buildNPM(
+      directory: 'app'
+      buildStamp: build_id
+    )
+    dir('app'){
+      sh("ls -lah")
+    }
     dir("dist") {
       sh("ls -lah")
 
-      def dist_files = sh_output("ls | wc -l").toInteger()
+      def dist_files = sh_output("find . -type f -name \'fakeSmmtService-*.zip\'").toInteger()
       log_info("$dist_files files in dist")
       return
       if (dist_files == 0) {
