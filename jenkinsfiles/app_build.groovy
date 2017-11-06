@@ -212,18 +212,21 @@ def get_tfenv() {
 }
 
 def build_and_deploy_lambda(params) {
-  String name = params.name
-  String repo = params.repo
-  String tf_component = params.tf_component
-  String code_branch = params.code_branch
-  String bucket_prefix = params.bucket_prefix
-  String bucket = bucket_prefix + params.environment
-  String build_id = params.build_id
-  def repoFunctionsFactory = params.repoFunctionsFactory
-  def awsFunctionsFactory = params.awsFunctionsFactory
-  def globalValuesFactory = params.globalValuesFactory
-  String environment = params.environment
-  def github = params.github
+  String name                   = params.name
+  String repo                   = params.repo
+  String tf_component           = params.tf_component
+  String code_branch            = params.code_branch
+  String bucket_prefix          = params.bucket_prefix
+  String bucket                 = bucket_prefix + params.environment
+  String build_id               = params.build_id
+  String jenkinsctrl_node_label = params.jenkinsctrl_node_label
+  String account                = params.account
+  String environment            = params.environment
+  def github                    = params.github
+  def repoFunctionsFactory      = params.repoFunctionsFactory
+  def awsFunctionsFactory       = params.awsFunctionsFactory
+  def globalValuesFactory       = params.globalValuesFactory
+
   tfvars = params.tfvars
   log_info("========================")
   log_info("name: ${name}")
@@ -325,7 +328,9 @@ node('builder') {
       repoFunctionsFactory: repoFunctionsFactory,
       globalValuesFactory: globalValuesFactory,
       github: github,
-      build_id: build_id
+      build_id: build_id,
+      jenkinsctrl_node_label: jenkinsctrl_node_label,
+      account: account
     )
     return
     build_and_deploy_lambda(
