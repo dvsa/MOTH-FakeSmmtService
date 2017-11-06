@@ -324,6 +324,7 @@ node('builder') {
       tf_component: 'fake_smmt',
       code_branch: brach,
       environment: environment,
+      awsFunctionsFactory: awsFunctionsFactory,
       repoFunctionsFactory: repoFunctionsFactory,
       globalValuesFactory: globalValuesFactory,
       github: github,
