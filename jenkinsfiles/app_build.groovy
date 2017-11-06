@@ -264,6 +264,26 @@ def build_and_deploy_lambda(params) {
 
   stage('TF Plan & Apply ' + name) {
     node(jenkinsctrl_node_label&&account) {
+      repoFunctionsFactory.checkoutGitRepo(
+        gitlab.infastructure.url,
+        gitlab.infastructure.branch,
+        gitlab.infastructure.name,
+        globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
+      )
+      dir(gitlab.infastructure.name) {
+        awsFunctionsFactory.terraformScaffold(
+          project,
+          environment,
+          account,
+          globalValuesFactory.AWS_REGION,
+          '',    // I'm not passing any extra args - lets keep this generic
+          'terraform_plan',
+          build_number,
+          tf_component,
+          bucket_prefix,
+          'plan' // When devs agree on this change we will change plan to apply.
+        )
+      }
       sh('ls -la')
       return
       if(tfvars) {

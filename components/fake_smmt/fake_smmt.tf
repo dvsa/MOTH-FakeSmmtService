@@ -13,7 +13,3 @@ module "fake_smmt" {
   lambda_ver                = "$LATEST"
   lambda_env_vars           = "${var.lambda_env_vars}"
 }
-
-output "api_gateway_url" {
-  value = "${module.fake_smmt.api_gateway_url}"
-}
