@@ -250,7 +250,12 @@ def build_and_deploy_lambda(params) {
       )
       dir("app/dist") {
         String dist_file = sh(script: "find . -type f -name \'*-${build_id}.zip\'", returnStdout: true).trim()
-        copy_file_to_s3(dist_file, 'uk.gov.dvsa.vehicle-recalls.dawidm')
+        awsFunctionsFactory.copyToS3(
+           'uk.gov.dvsa.vehicle-recalls.dawidm',
+           dist_file,
+           'FB_AWS_CREDENTIALS'
+        )
+        // copy_file_to_s3(dist_file, 'uk.gov.dvsa.vehicle-recalls.dawidm')
       }
     }
     return
