@@ -119,23 +119,8 @@ def build_and_upload_js(bucket,build_id) {
       'app',
       build_id
     )
-    dir('app'){
-      sh("ls -lah")
-    }
     dir("app/dist") {
-      sh("ls -lah")
       String dist_files = sh(script: "find . -type f -name \'*-${build_id}.zip\'", returnStdout: true).trim()
-      log_info("$dist_files files in dist")
-      return
-      if (dist_files == 0) {
-        abort_build("Dist file not found, aborting")
-      }
-
-      if (dist_files > 1) {
-        abort_build("More than one file in dist, aborting")
-      }
-
-      dist_file = sh_output("ls")
       copy_file_to_s3(dist_file, bucket)
     }
     return
