@@ -250,6 +250,7 @@ def build_and_deploy_lambda(params) {
       )
       dir("app/dist") {
         String dist_file = sh(script: "find . -type f -name \'*-${build_id}.zip\'", returnStdout: true).trim()
+        log_info("Found: ${dist_file}")
         awsFunctionsFactory.copyToS3(
            'uk.gov.dvsa.vehicle-recalls.dawidm',
            dist_file,
