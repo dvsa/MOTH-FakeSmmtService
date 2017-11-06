@@ -125,7 +125,7 @@ def build_and_upload_js(bucket,build_id) {
     dir("app/dist") {
       sh("ls -lah")
 
-      String dist_files = sh_output("find . -type f -name \'fakeSmmtService-${build_id}.zip\'").toInteger()
+      String dist_files = sh("find . -type f -name \'*-${build_id}.zip\'")
       log_info("$dist_files files in dist")
       return
       if (dist_files == 0) {
