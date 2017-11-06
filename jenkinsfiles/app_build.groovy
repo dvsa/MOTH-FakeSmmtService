@@ -115,14 +115,8 @@ Boolean buildNPM(
 }
 
 def build_and_upload_js(bucket,build_id) {
-    buildNPM(
-      'app',
-      build_id
-    )
-    dir("app/dist") {
-      String dist_file = sh(script: "find . -type f -name \'*-${build_id}.zip\'", returnStdout: true).trim()
-      copy_file_to_s3(dist_file, bucket)
-    }
+
+
     return
     return dist_file
   }
@@ -250,7 +244,14 @@ def build_and_deploy_lambda(params) {
       globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
     )
     dir(github.fake_smmt.name) {
-      dist = build_and_upload_js(bucket, build_id)
+      buildNPM(
+        'app',
+        build_id
+      )
+      dir("app/dist") {
+        String dist_file = sh(script: "find . -type f -name \'*-${build_id}.zip\'", returnStdout: true).trim()
+        copy_file_to_s3(dist_file, bucket)
+      }
     }
     return
   }
@@ -309,7 +310,7 @@ node(jenkinsctrl_node_label&&account) {
     }
   }
 
-node('builder') {
+node(jenkinsctrl_node_label&&account) {
     fake_smmt_url = build_and_deploy_lambda(
       name: 'Fake SMMT',
       bucket_prefix: bucket_prefix,
