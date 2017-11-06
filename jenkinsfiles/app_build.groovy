@@ -120,7 +120,7 @@ def build_and_upload_js(bucket,build_id) {
       build_id
     )
     dir("app/dist") {
-      String dist_files = sh(script: "find . -type f -name \'*-${build_id}.zip\'", returnStdout: true).trim()
+      String dist_file = sh(script: "find . -type f -name \'*-${build_id}.zip\'", returnStdout: true).trim()
       copy_file_to_s3(dist_file, bucket)
     }
     return
