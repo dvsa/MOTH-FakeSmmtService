@@ -12,6 +12,7 @@ module "vehicle_recalls_api" {
   lambda_timeout            = "15"
   lambda_ver                = "$LATEST"
   lambda_env_vars           = "${var.lambda_env_vars}"
+  api_rate_limit_vars       = "${var.api_rate_limit_vars}"
 }
 
 output "api_gateway_url" {

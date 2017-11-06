@@ -27,3 +27,9 @@ variable "lambda_env_vars" {
     "default" = "default"
   }
 }
+
+variable "api_rate_limit_vars" {
+  type    = "map"
+  default = {
+  }
+}
