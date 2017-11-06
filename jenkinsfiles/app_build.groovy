@@ -222,6 +222,7 @@ def build_and_deploy_lambda(params) {
   def repoFunctionsFactory = params.repoFunctionsFactory
   def awsFunctionsFactory = params.awsFunctionsFactory
   def globalValuesFactory = params.globalValuesFactory
+  String environment = params.environment
   def github = params.github
   tfvars = params.tfvars
   log_info("========================")
@@ -233,10 +234,7 @@ def build_and_deploy_lambda(params) {
   log_info("bucket: ${bucket}")
   log_info("tfvars: ${tfvars}")
   log_info("========================")
-
-
   dist = ''
-
   stage('Build ' + name) {
     repoFunctionsFactory.checkoutGitRepo(
       github.fake_smmt.url,
@@ -253,21 +251,18 @@ def build_and_deploy_lambda(params) {
         String dist_file = sh(script: "find . -type f -name \'*-${build_id}.zip\'", returnStdout: true).trim()
         log_info("Found: ${dist_file}")
         awsFunctionsFactory.copyToS3(
-           'uk.gov.dvsa.vehicle-recalls.dawidm',
+           "uk.gov.dvsa.vehicle-recalls.${environment}",
            dist_file,
            'FB_AWS_CREDENTIALS'
         )
-        // copy_file_to_s3(dist_file, 'uk.gov.dvsa.vehicle-recalls.dawidm')
       }
     }
-    return
   }
-  return
-  stage('TF Plan & Apply ' + name) {
-    node('ctrl' && 'dev') {
-      get_tfenv()
-      fetch_infrastructure_code()
 
+  stage('TF Plan & Apply ' + name) {
+    node(jenkinsctrl_node_label&&account) {
+      sh('ls -la')
+      return
       if(tfvars) {
         tfvars.each { entry ->
           populate_tfvars(entry.key, entry.value)
@@ -281,6 +276,7 @@ def build_and_deploy_lambda(params) {
       return tf_output('api_gateway_url', tf_component)
     }
   }
+  return
 }
 
 node(jenkinsctrl_node_label&&account) {
