@@ -250,7 +250,7 @@ def build_and_deploy_lambda(params) {
       )
       dir("app/dist") {
         String dist_file = sh(script: "find . -type f -name \'*-${build_id}.zip\'", returnStdout: true).trim()
-        copy_file_to_s3(dist_file, bucket)
+        copy_file_to_s3(dist_file, 'uk.gov.dvsa.vehicle-recalls.dawidm')
       }
     }
     return
@@ -310,7 +310,7 @@ node(jenkinsctrl_node_label&&account) {
     }
   }
 
-node(jenkinsctrl_node_label&&account) {
+node('builder') {
     fake_smmt_url = build_and_deploy_lambda(
       name: 'Fake SMMT',
       bucket_prefix: bucket_prefix,
