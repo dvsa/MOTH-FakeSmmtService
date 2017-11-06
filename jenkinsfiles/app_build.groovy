@@ -220,6 +220,7 @@ def build_and_deploy_lambda(params) {
   String bucket = bucket_prefix + params.environment
   String build_id = params.build_id
   def repoFunctionsFactory = params.repoFunctionsFactory
+  def awsFunctionsFactory = params.awsFunctionsFactory
   def globalValuesFactory = params.globalValuesFactory
   def github = params.github
   tfvars = params.tfvars
