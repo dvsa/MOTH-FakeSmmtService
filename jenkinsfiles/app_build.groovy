@@ -222,6 +222,7 @@ def build_and_deploy_lambda(params) {
   String jenkinsctrl_node_label = params.jenkinsctrl_node_label
   String account                = params.account
   String environment            = params.environment
+  String project                = params.project
   def github                    = params.github
   def gitlab                    = params.gitlab
   def repoFunctionsFactory      = params.repoFunctionsFactory
@@ -353,6 +354,7 @@ node('builder') {
       build_id: build_id,
       jenkinsctrl_node_label: jenkinsctrl_node_label,
       account: account
+      project: project
     )
     return
     build_and_deploy_lambda(
