@@ -348,6 +348,7 @@ node('builder') {
       repoFunctionsFactory: repoFunctionsFactory,
       globalValuesFactory: globalValuesFactory,
       github: github,
+      gitlab: gitlab,
       build_id: build_id,
       jenkinsctrl_node_label: jenkinsctrl_node_label,
       account: account
