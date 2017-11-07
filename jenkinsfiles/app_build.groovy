@@ -294,12 +294,6 @@ def build_and_deploy_lambda(params) {
               'apply'
             )
           }
-          dir(gitlab.infastructure.name+"/components/"+tf_component+"/.terraform") {
-            sh("ls -la")
-          }
-
-          log_info("TERRAFORM OUTPUT: ${terraform_output}")
-
           return
           sh('ls -la')
 
