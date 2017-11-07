@@ -285,7 +285,7 @@ def build_and_deploy_lambda(params) {
               environment,
               account,
               globalValuesFactory.AWS_REGION,
-              '',    // I'm not passing any extra args - lets keep this generic
+              "-var lambda_s3_key=${dist_file}",
               'terraform_plan',
               build_number,
               tf_component,
