@@ -228,7 +228,7 @@ def build_and_deploy_lambda(params) {
   def repoFunctionsFactory      = params.repoFunctionsFactory
   def awsFunctionsFactory       = params.awsFunctionsFactory
   def globalValuesFactory       = params.globalValuesFactory
-
+  String dist_file
   tfvars = params.tfvars
   log_info("========================")
   log_info("name: ${name}")
@@ -239,7 +239,7 @@ def build_and_deploy_lambda(params) {
   log_info("bucket: ${bucket}")
   log_info("tfvars: ${tfvars}")
   log_info("========================")
-  dist = ''
+
   stage('Build ' + name) {
     repoFunctionsFactory.checkoutGitRepo(
       github.fake_smmt.url,
@@ -253,7 +253,7 @@ def build_and_deploy_lambda(params) {
         build_id
       )
       dir("app/dist") {
-        String dist_file = sh(script: "find . -type f -name \'*-${build_id}.zip\'", returnStdout: true).trim()
+        dist_file = sh(script: "find . -type f -name \'*-${build_id}.zip\'", returnStdout: true).trim()
         log_info("Found: ${dist_file}")
         awsFunctionsFactory.copyToS3(
            "uk.gov.dvsa.vehicle-recalls.${environment}",
