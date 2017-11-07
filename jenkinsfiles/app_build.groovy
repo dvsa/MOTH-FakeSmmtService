@@ -295,7 +295,7 @@ def build_and_deploy_lambda(params) {
             )
           }
           dir(gitlab.infastructure.name) {
-            awsFunctionsFactory.terraformScaffold(
+            String terraform_output = awsFunctionsFactory.terraformScaffold(
               project,
               environment,
               account,
@@ -308,6 +308,7 @@ def build_and_deploy_lambda(params) {
               'output' // When devs agree on this change we will change plan to apply.
             )
           }
+          log_info("TERRAFORM OUTPUT: ${terraform_output}")
           return
           sh('ls -la')
 
