@@ -291,12 +291,26 @@ def build_and_deploy_lambda(params) {
               build_number,
               tf_component,
               bucket_prefix,
-              'plan' // When devs agree on this change we will change plan to apply.
+              'apply' // When devs agree on this change we will change plan to apply.
             )
           }
-
-          sh('ls -la')
+          dir(gitlab.infastructure.name) {
+            awsFunctionsFactory.terraformScaffold(
+              project,
+              environment,
+              account,
+              globalValuesFactory.AWS_REGION,
+              "-var lambda_s3_key=${lambda_s3_key}",
+              'terraform_plan',
+              build_number,
+              tf_component,
+              bucket_prefix,
+              'output' // When devs agree on this change we will change plan to apply.
+            )
+          }
           return
+          sh('ls -la')
+
           if(tfvars) {
             tfvars.each { entry ->
               populate_tfvars(entry.key, entry.value)
