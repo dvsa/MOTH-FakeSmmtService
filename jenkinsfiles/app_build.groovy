@@ -279,7 +279,7 @@ def build_and_deploy_lambda(params) {
             gitlab.infastructure.name,
             globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
           )
-          String lambda_s3_key = dist_file.substring(dist_file.lastIndexOf("/"))
+          String lambda_s3_key = dist_file.substring(dist_file.lastIndexOf("/")).replaceAll('/','')
           dir(gitlab.infastructure.name) {
             awsFunctionsFactory.terraformScaffold(
               project,
