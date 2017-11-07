@@ -353,7 +353,7 @@ node('builder') {
       gitlab: gitlab,
       build_id: build_id,
       jenkinsctrl_node_label: jenkinsctrl_node_label,
-      account: account
+      account: account,
       project: project
     )
     return
