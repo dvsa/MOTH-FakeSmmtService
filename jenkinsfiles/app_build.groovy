@@ -300,7 +300,7 @@ def build_and_deploy_lambda(params) {
               environment,
               account,
               globalValuesFactory.AWS_REGION,
-              "-var lambda_s3_key=${lambda_s3_key}",
+              '',
               'terraform_plan',
               build_number,
               tf_component,
