@@ -265,43 +265,52 @@ def build_and_deploy_lambda(params) {
   }
 
   stage('TF Plan & Apply ' + name) {
-    node(jenkinsctrl_node_label&&account) {
-      repoFunctionsFactory.checkoutGitRepo(
-        gitlab.infastructure.url,
-        gitlab.infastructure.branch,
-        gitlab.infastructure.name,
-        globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
-      )
-      dir(gitlab.infastructure.name) {
-        awsFunctionsFactory.terraformScaffold(
-          project,
-          environment,
-          account,
-          globalValuesFactory.AWS_REGION,
-          '',    // I'm not passing any extra args - lets keep this generic
-          'terraform_plan',
-          build_number,
-          tf_component,
-          bucket_prefix,
-          'plan' // When devs agree on this change we will change plan to apply.
-        )
-      }
-      sh('ls -la')
-      return
-      if(tfvars) {
-        tfvars.each { entry ->
-          populate_tfvars(entry.key, entry.value)
+    wrap([
+      $class: 'TimestamperBuildWrapper'
+    ]) {
+      wrap([
+        $class:       'AnsiColorBuildWrapper',
+        colorMapName: 'xterm'
+      ]) {
+        node(jenkinsctrl_node_label&&account) {
+          repoFunctionsFactory.checkoutGitRepo(
+            gitlab.infastructure.url,
+            gitlab.infastructure.branch,
+            gitlab.infastructure.name,
+            globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
+          )
+          dir(gitlab.infastructure.name) {
+            awsFunctionsFactory.terraformScaffold(
+              project,
+              environment,
+              account,
+              globalValuesFactory.AWS_REGION,
+              '',    // I'm not passing any extra args - lets keep this generic
+              'terraform_plan',
+              build_number,
+              tf_component,
+              bucket_prefix,
+              'plan' // When devs agree on this change we will change plan to apply.
+            )
+          }
+          sh('ls -la')
+          return
+          if(tfvars) {
+            tfvars.each { entry ->
+              populate_tfvars(entry.key, entry.value)
+            }
+          }
+          populate_tfvars("lambda_s3_key", dist)
+
+          tf_scaffold('plan', tf_component, "")
+          tf_scaffold('apply', tf_component, "")
+
+          return tf_output('api_gateway_url', tf_component)
         }
       }
-      populate_tfvars("lambda_s3_key", dist)
-
-      tf_scaffold('plan', tf_component, "")
-      tf_scaffold('apply', tf_component, "")
-
-      return tf_output('api_gateway_url', tf_component)
+      return
     }
   }
-  return
 }
 
 node(jenkinsctrl_node_label&&account) {
