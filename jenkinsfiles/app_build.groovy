@@ -291,23 +291,13 @@ def build_and_deploy_lambda(params) {
               build_number,
               tf_component,
               bucket_prefix,
-              'apply' // When devs agree on this change we will change plan to apply.
+              'apply'
             )
           }
-          String terraform_output
-          dir(gitlab.infastructure.name) {
-            terraform_output = awsFunctionsFactory.terraformScaffoldOutput(
-              project,
-              environment,
-              account,
-              globalValuesFactory.AWS_REGION,
-              'api_gateway_url',
-              'terraform_plan',
-              build_number,
-              tf_component,
-              bucket_prefix,
-            )
+          dir(gitlab.infastructure.name+"/components/"+tf_component+"/.terraform") {
+            sh("ls -la")
           }
+
           log_info("TERRAFORM OUTPUT: ${terraform_output}")
 
           return
