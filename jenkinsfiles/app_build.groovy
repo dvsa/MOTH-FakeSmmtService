@@ -279,13 +279,14 @@ def build_and_deploy_lambda(params) {
             gitlab.infastructure.name,
             globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
           )
+          String lambda_s3_key = dist_file.substring(dist_file.lastIndexOf("/"))
           dir(gitlab.infastructure.name) {
             awsFunctionsFactory.terraformScaffold(
               project,
               environment,
               account,
               globalValuesFactory.AWS_REGION,
-              "-var lambda_s3_key=${dist_file}",
+              "-var lambda_s3_key=${lambda_s3_key}",
               'terraform_plan',
               build_number,
               tf_component,
@@ -293,6 +294,7 @@ def build_and_deploy_lambda(params) {
               'plan' // When devs agree on this change we will change plan to apply.
             )
           }
+
           sh('ls -la')
           return
           if(tfvars) {
