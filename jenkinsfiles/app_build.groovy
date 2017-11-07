@@ -300,7 +300,7 @@ def build_and_deploy_lambda(params) {
               environment,
               account,
               globalValuesFactory.AWS_REGION,
-              '',
+              'api_gateway_url',
               'terraform_plan',
               build_number,
               tf_component,
