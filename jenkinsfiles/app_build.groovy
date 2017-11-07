@@ -223,6 +223,7 @@ def build_and_deploy_lambda(params) {
   String account                = params.account
   String environment            = params.environment
   def github                    = params.github
+  def gitlab                    = params.gitlab
   def repoFunctionsFactory      = params.repoFunctionsFactory
   def awsFunctionsFactory       = params.awsFunctionsFactory
   def globalValuesFactory       = params.globalValuesFactory
