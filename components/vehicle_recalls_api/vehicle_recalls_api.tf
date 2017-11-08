@@ -12,8 +12,5 @@ module "vehicle_recalls_api" {
   lambda_timeout            = "15"
   lambda_ver                = "$LATEST"
   lambda_env_vars           = "${var.lambda_env_vars}"
-}
-
-output "api_gateway_url" {
-  value = "${module.vehicle_recalls_api.api_gateway_url}"
+  api_gateway_url           = "${data.terraform_remote_state.fake_smmt.api_gateway_url}"
 }
