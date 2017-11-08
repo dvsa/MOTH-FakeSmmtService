@@ -11,5 +11,4 @@ module "fake_smmt" {
   lambda_memory_size        = "256"
   lambda_timeout            = "15"
   lambda_ver                = "$LATEST"
-  lambda_env_vars           = "${var.lambda_env_vars}"
 }

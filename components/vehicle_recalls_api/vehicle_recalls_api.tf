@@ -11,6 +11,8 @@ module "vehicle_recalls_api" {
   lambda_memory_size        = "256"
   lambda_timeout            = "15"
   lambda_ver                = "$LATEST"
-  lambda_env_vars           = "${var.lambda_env_vars}"
-  api_gateway_url           = "${data.terraform_remote_state.fake_smmt.api_gateway_url}"
+  lambda_env_vars           = {
+    SMMT_API_URI = "${data.terraform_remote_state.fake_smmt.api_gateway_url}/vincheck"
+    SMMT_API_KEY = "localApiKey"
+  }
 }
