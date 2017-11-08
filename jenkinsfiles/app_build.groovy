@@ -247,7 +247,6 @@ def build_and_deploy_lambda(params) {
   String repoDir = repo.substring(repo.lastIndexOf("/")).replaceAll('/','')
   log_info("${repoDir}")
   log_info("========================")
-  return
   stage('Build ' + name) {
     repoFunctionsFactory.checkoutGitRepo(
       repo,
@@ -255,7 +254,7 @@ def build_and_deploy_lambda(params) {
       repoDir, // We will agree together on the naming - probably we will use gitlab.infastructure.name
       globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
     )
-    dir(github.fake_smmt.name) {
+    dir(repoDir) {
       buildNPM(
         'app',
         build_id
@@ -271,7 +270,7 @@ def build_and_deploy_lambda(params) {
       }
     }
   }
-
+  return
   stage('TF Plan & Apply ' + name) {
     wrap([
       $class: 'TimestamperBuildWrapper'
@@ -358,24 +357,24 @@ node(jenkinsctrl_node_label&&account) {
   }
 
 node('builder') {
-    fake_smmt_url = build_and_deploy_lambda(
-      name: 'Fake SMMT',
-      bucket_prefix: bucket_prefix,
-      repo: github.fake_smmt.url,
-      tf_component: 'fake_smmt',
-      code_branch: brach,
-      environment: environment,
-      awsFunctionsFactory: awsFunctionsFactory,
-      repoFunctionsFactory: repoFunctionsFactory,
-      globalValuesFactory: globalValuesFactory,
-      github: github,
-      gitlab: gitlab,
-      build_id: build_id,
-      jenkinsctrl_node_label: jenkinsctrl_node_label,
-      account: account,
-      project: project
-    )
-    return
+    // fake_smmt_url = build_and_deploy_lambda(
+    //   name: 'Fake SMMT',
+    //   bucket_prefix: bucket_prefix,
+    //   repo: github.fake_smmt.url,
+    //   tf_component: 'fake_smmt',
+    //   code_branch: brach,
+    //   environment: environment,
+    //   awsFunctionsFactory: awsFunctionsFactory,
+    //   repoFunctionsFactory: repoFunctionsFactory,
+    //   globalValuesFactory: globalValuesFactory,
+    //   github: github,
+    //   gitlab: gitlab,
+    //   build_id: build_id,
+    //   jenkinsctrl_node_label: jenkinsctrl_node_label,
+    //   account: account,
+    //   project: project
+    // )
+    // return
     build_and_deploy_lambda(
       name: 'Vehicle Recalls',
       bucket_prefix: bucket_prefix,
