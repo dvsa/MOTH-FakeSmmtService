@@ -270,7 +270,7 @@ def build_and_deploy_lambda(params) {
       }
     }
   }
-  return
+  
   stage('TF Plan & Apply ' + name) {
     wrap([
       $class: 'TimestamperBuildWrapper'
@@ -298,7 +298,7 @@ def build_and_deploy_lambda(params) {
               build_number,
               tf_component,
               bucket_prefix,
-              'apply'
+              'plan'
             )
           }
           // return
