@@ -35,6 +35,11 @@ Map<String, Map<String, String>> github = [
     group: 'dvsa',
     name: 'vehicle-recalls-fake-smmt-service',
     branch: branch
+  ],
+  vehicle_recalls_api: [
+    group: 'dvsa',
+    name: 'vehicle-recalls-api',
+    branch: branch
   ]
 ]
 
@@ -238,13 +243,16 @@ def build_and_deploy_lambda(params) {
   log_info("bucket_prefix: ${bucket_prefix}")
   log_info("bucket: ${bucket}")
   log_info("tfvars: ${tfvars}")
+  log_info("repo: ${repo}")
+  String repoDir = repo.substring(repo.lastIndexOf("/")).replaceAll('/','')
+  log_info("${repoDir}")
   log_info("========================")
-
+  return
   stage('Build ' + name) {
     repoFunctionsFactory.checkoutGitRepo(
-      github.fake_smmt.url,
+      repo,
       'master', // Change that to branch after tests
-      github.fake_smmt.name, // We will agree together on the naming - probably we will use gitlab.infastructure.name
+      repoDir, // We will agree together on the naming - probably we will use gitlab.infastructure.name
       globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
     )
     dir(github.fake_smmt.name) {
@@ -294,23 +302,23 @@ def build_and_deploy_lambda(params) {
               'apply'
             )
           }
-          return
-          sh('ls -la')
-
-          if(tfvars) {
-            tfvars.each { entry ->
-              populate_tfvars(entry.key, entry.value)
-            }
-          }
-          populate_tfvars("lambda_s3_key", dist)
-
-          tf_scaffold('plan', tf_component, "")
-          tf_scaffold('apply', tf_component, "")
-
-          return tf_output('api_gateway_url', tf_component)
+          // return
+          // sh('ls -la')
+          //
+          // if(tfvars) {
+          //   tfvars.each { entry ->
+          //     populate_tfvars(entry.key, entry.value)
+          //   }
+          // }
+          // populate_tfvars("lambda_s3_key", dist)
+          //
+          // tf_scaffold('plan', tf_component, "")
+          // tf_scaffold('apply', tf_component, "")
+          //
+          // return tf_output('api_gateway_url', tf_component)
         }
       }
-      return
+
     }
   }
 }
@@ -353,7 +361,7 @@ node('builder') {
     fake_smmt_url = build_and_deploy_lambda(
       name: 'Fake SMMT',
       bucket_prefix: bucket_prefix,
-      repo: github.fake_smmt.name,
+      repo: github.fake_smmt.url,
       tf_component: 'fake_smmt',
       code_branch: brach,
       environment: environment,
@@ -370,13 +378,19 @@ node('builder') {
     return
     build_and_deploy_lambda(
       name: 'Vehicle Recalls',
-      environment: environment,
-      bucket_prefix: BUCKET_PREFIX,
-      repo: 'vehicle-recalls-api',
+      bucket_prefix: bucket_prefix,
+      repo: github.vehicle_recalls_api.url,
       tf_component: 'vehicle_recalls_api',
-      code_branch: BRANCH,
-      tfvars: [
-        "fake_smmt_url": fake_smmt_url
-      ]
+      code_branch: brach,
+      environment: environment,
+      awsFunctionsFactory: awsFunctionsFactory,
+      repoFunctionsFactory: repoFunctionsFactory,
+      globalValuesFactory: globalValuesFactory,
+      github: github,
+      gitlab: gitlab,
+      build_id: build_id,
+      jenkinsctrl_node_label: jenkinsctrl_node_label,
+      account: account,
+      project: project
     )
 }
