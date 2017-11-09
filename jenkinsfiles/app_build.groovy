@@ -250,7 +250,7 @@ def build_and_deploy_lambda(params) {
   stage('Build ' + name) {
     repoFunctionsFactory.checkoutGitRepo(
       repo,
-      'master', // Change that to branch after tests
+      'npm-fix', // Change that to branch after tests
       repoDir, // We will agree together on the naming - probably we will use gitlab.infastructure.name
       globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
     )
@@ -270,7 +270,7 @@ def build_and_deploy_lambda(params) {
       }
     }
   }
-  
+
   stage('TF Plan & Apply ' + name) {
     wrap([
       $class: 'TimestamperBuildWrapper'
