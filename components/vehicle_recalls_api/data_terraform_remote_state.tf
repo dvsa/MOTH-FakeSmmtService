@@ -1,4 +1,4 @@
-data "terraform_remote_state" "mgmt" {
+data "terraform_remote_state" "fake_smmt" {
   backend = "s3"
 
   config {
