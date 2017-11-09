@@ -11,6 +11,11 @@ module "fake_smmt" {
   lambda_memory_size        = "256"
   lambda_timeout            = "15"
   lambda_ver                = "$LATEST"
-  lambda_env_vars           = "${var.lambda_env_vars}"
+  lambda_env_vars           = {
+    SMMT_API_URI = "/vincheck"
+    SMMT_API_KEY = "localApiKey"
+    SERVICE_NAME = "vehicle-recalls"
+    SERVICE_ENV = "${var.environment}"
+  }
   api_rate_limit_vars       = "${var.api_rate_limit_vars}"
 }
