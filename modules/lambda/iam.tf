@@ -8,3 +8,9 @@ resource "aws_iam_role_policy" "enable_cwlogs_policy" {
   role   = "${aws_iam_role.lambda.id}"
   policy = "${data.template_file.enable_cwlogs_policy.rendered}"
 }
+
+resource "aws_iam_role_policy" "decrypt_kms_policy" {
+  name   = "${var.lambda_function_name}-decrypt-kms-${var.environment}"
+  role   = "${aws_iam_role.lambda.id}"
+  policy = "${data.template_file.decrypt_kms_policy.rendered}"
+}
