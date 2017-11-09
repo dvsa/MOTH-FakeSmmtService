@@ -28,3 +28,18 @@ variable "lambda_env_vars" {
     "SMMT_API_KEY" = "localApiKey"
   }
 }
+
+variable "account_id" {
+  type = "string"
+  default = "Account ID where we are creating resources"
+}
+
+variable "project" {
+  type = "string"
+  default = "Account ID where we are creating resources"
+}
+
+variable "fake_smmt_component_name" {
+  type = "string"
+  default = "Optional fake smmt component"
+}
