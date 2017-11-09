@@ -1,8 +1,10 @@
-data "template_file" "lambda_assumerole_policy" {
-  template = "${file("${path.module}/../iam_policies/lambda_assumerole_policy.json.tpl")}"
-}
-
 resource "aws_iam_role" "lambda" {
   name               = "${var.lambda_function_name}-${var.environment}"
-  assume_role_policy = "${data.template_file.lambda_assumerole_policy.rendered}"
+  assume_role_policy = "${data.template_file.assume_role_policy.rendered}"
+}
+
+resource "aws_iam_role_policy" "enable_cwlogs_policy" {
+  name   = "${var.lambda_function_name}-enable-cwlogs-${var.environment}"
+  role   = "${aws_iam_role.lambda.id}"
+  policy = "${data.template_file.enable_cwlogs_policy.rendered}"
 }
