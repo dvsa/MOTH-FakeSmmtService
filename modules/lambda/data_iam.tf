@@ -11,3 +11,12 @@ data "template_file" "enable_cwlogs_policy" {
     lambda_function = "${aws_lambda_function.lambda.function_name}"
   }
 }
+
+data "template_file" "decrypt_kms_policy" {
+  template = "${file("${path.module}/templates/lambda_decrypt_kms_policy.json.tpl")}"
+
+  vars {
+    aws_region      = "${var.aws_region}"
+    account_id      = "${data.aws_caller_identity.current.account_id}"
+  }
+}
