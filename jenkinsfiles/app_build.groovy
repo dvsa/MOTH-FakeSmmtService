@@ -110,7 +110,7 @@ Boolean buildNPM(
   dir(directory) {
     Integer status = sh(
       script: """
-        npm install
+        npm install yarn --save-dev && ./node_modules/yarn/bin/yarn
         BUILDSTAMP=${buildStamp} npm run build
       """,
       returnStatus: true
@@ -250,7 +250,7 @@ def build_and_deploy_lambda(params) {
   stage('Build ' + name) {
     repoFunctionsFactory.checkoutGitRepo(
       repo,
-      'npm-fix', // Change that to branch after tests
+      'master', // Change that to branch after tests
       repoDir, // We will agree together on the naming - probably we will use gitlab.infastructure.name
       globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
     )
