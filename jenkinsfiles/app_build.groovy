@@ -50,7 +50,7 @@ def verify_or_create_bucket(String bucket_prefix, String tf_component) {
 
 def build_and_upload_js(bucket) {
   dir("app") {
-    sh("npm install")
+    sh("npm install yarn --save-dev && ./node_modules/yarn/bin/yarn")
     sh("npm run build")
 
     dir("dist") {
