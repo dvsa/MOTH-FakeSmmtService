@@ -11,10 +11,7 @@ resource "aws_lambda_function" "lambda" {
   timeout       = "${var.lambda_timeout}"
 
   environment {
-    variables = {
-      SMMT_API_URI = "${var.api_gateway_url}/vincheck"
-      SMMT_API_KEY = "localApiKey"
-    }
+    variables = "${var.lambda_env_vars}"
   }
 
   depends_on = ["aws_api_gateway_rest_api.api"]
