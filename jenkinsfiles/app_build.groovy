@@ -1,8 +1,9 @@
 AWS_REGION = 'eu-west-1'
 TF_LOG_LEVEL = 'ERROR'
-ENV = 'int'
+ENV = 'szymonf'
 TF_PROJECT = 'vehicle-recalls'
 BUCKET_PREFIX = 'uk.gov.dvsa.vehicle-recalls.'
+BUCKET = BUCKET_PREFIX + ENV
 BRANCH = params.BRANCH
 
 def sh_output(String script) {
@@ -27,8 +28,7 @@ def bucket_exists(String bucket) {
   return sh_status("aws s3 ls s3://${bucket} --region ${AWS_REGION} 2>&1 | grep -q -e \'NoSuchBucket\' -e \'AccessDenied\'")
 }
 
-def verify_or_create_bucket(String bucket_prefix, String tf_component) {
-  bucket = bucket_prefix + ENV
+def verify_or_create_bucket(String bucket, String tf_component) {
 
   if (bucket_exists(bucket) == 1) {
     log_info("Bucket ${bucket} found")
@@ -169,41 +169,32 @@ def get_tfenv() {
   }
 }
 
-def build_and_deploy_lambda(params) {
-  String name = params.name
-  String repo = params.repo
-  String tf_component = params.tf_component
-  String code_branch = params.code_branch
-  String bucket_prefix = params.bucket_prefix
-  String bucket = bucket_prefix + ENV
-  tfvars = params.tfvars
-  dist = ''
-
+def stage_build_and_upload_js(name, repo, code_branch, bucket) {
   stage('Build ' + name) {
     sh("rm -rf \"${repo}\"")
 
     checkout_github_repo_branch_or_master("dvsa", repo, code_branch)
     dir(repo) {
       dist = build_and_upload_js(bucket)
+      return dist
     }
   }
+}
 
+def stage_tf_plan_and_apply(name, tf_component, fake_smmt_dist, vehicle_recalls_api_dist) {
   stage('TF Plan & Apply ' + name) {
     node('ctrl' && 'dev') {
       get_tfenv()
       fetch_infrastructure_code()
 
-      if(tfvars) {
-        tfvars.each { entry ->
-          populate_tfvars(entry.key, entry.value)
-        }
-      }
-      populate_tfvars("lambda_s3_key", dist)
+      populate_tfvars("fake_smmt_lambda_s3_key", fake_smmt_dist)
+      populate_tfvars("vehicle_recalls_api_lambda_s3_key", vehicle_recalls_api_dist)
 
+      //tf_scaffold('plan -destroy', tf_component, "")
       tf_scaffold('plan', tf_component, "")
       tf_scaffold('apply', tf_component, "")
 
-      return tf_output('api_gateway_url', tf_component)
+      return tf_output('vehicle_recalls_api_gateway_url', tf_component)
     }
   }
 }
@@ -224,27 +215,13 @@ node('builder') {
             log_info("Building branch \"${BRANCH}\"")
 
             stage('Verify S3 Bucket') {
-              verify_or_create_bucket(BUCKET_PREFIX, 's3')
+              verify_or_create_bucket(BUCKET, 's3')
             }
 
-            fake_smmt_url = build_and_deploy_lambda(
-              name: 'Fake SMMT',
-              bucket_prefix: BUCKET_PREFIX,
-              repo: 'vehicle-recalls-fake-smmt-service',
-              tf_component: 'fake_smmt',
-              code_branch: BRANCH
-            )
+            fake_smmt_dist = stage_build_and_upload_js("Vehicle Recalls", 'vehicle-recalls-fake-smmt-service', BRANCH, BUCKET)
+            vehicle_recalls_api_dist = stage_build_and_upload_js("Vehicle Recalls", 'vehicle-recalls-api', BRANCH, BUCKET)
 
-            build_and_deploy_lambda(
-              name: 'Vehicle Recalls',
-              bucket_prefix: BUCKET_PREFIX,
-              repo: 'vehicle-recalls-api',
-              tf_component: 'vehicle_recalls_api',
-              code_branch: BRANCH,
-              tfvars: [
-                "fake_smmt_url": fake_smmt_url
-              ]
-            )
+            stage_tf_plan_and_apply("Vehicle Recalls", 'vehicle_recalls', fake_smmt_dist, vehicle_recalls_api_dist)
           }
         }
       }
