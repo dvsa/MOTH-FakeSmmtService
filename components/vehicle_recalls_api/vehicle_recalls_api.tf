@@ -15,4 +15,6 @@ module "vehicle_recalls_api" {
     SMMT_API_URI = "${data.terraform_remote_state.fake_smmt.api_gateway_url}/vincheck"
     SMMT_API_KEY = "localApiKey"
   }
+  lambda_env_vars           = "${var.lambda_env_vars}"
+  api_rate_limit_vars       = "${var.api_rate_limit_vars}"
 }

@@ -43,3 +43,12 @@ variable "fake_smmt_component_name" {
   type = "string"
   default = "Optional fake smmt component"
 }
+
+variable "api_rate_limit_vars" {
+  type    = "map"
+  default = {
+    "quota_monthly" = 2500000
+    "burst_limit" = 40
+    "rate_limit" = 2
+  }
+}

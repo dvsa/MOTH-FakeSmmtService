@@ -17,6 +17,8 @@ resource "aws_lambda_function" "lambda" {
   depends_on = ["aws_api_gateway_rest_api.api"]
 }
 
+
+
 //we probably don't need it
 resource "aws_lambda_alias" "lambda_alias" {
   name             = "${var.environment}"

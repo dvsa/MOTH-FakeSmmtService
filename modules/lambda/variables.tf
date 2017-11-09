@@ -55,3 +55,9 @@ variable "lambda_s3_key" {
   type        = "string"
   description = "Lambda S3 Key"
 }
+
+variable "api_rate_limit_vars" {
+  type    = "map"
+  default = {}
+  description = "Pass rate limit and quota vars if required. Pass empty map if rate limiting not required"
+}
