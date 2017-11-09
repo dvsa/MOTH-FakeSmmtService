@@ -348,7 +348,7 @@ node(jenkinsctrl_node_label&&account) {
               build_number,
               's3',
               bucket_prefix,
-              'apply' // When devs agree on this change we will change plan to apply.
+              'plan' // When devs agree on this change we will change plan to apply.
             )
           }
         }
@@ -357,24 +357,24 @@ node(jenkinsctrl_node_label&&account) {
   }
 
 node('builder') {
-    fake_smmt_url = build_and_deploy_lambda(
-      name: 'Fake SMMT',
-      bucket_prefix: bucket_prefix,
-      repo: github.fake_smmt.url,
-      tf_component: 'fake_smmt',
-      code_branch: brach,
-      environment: environment,
-      awsFunctionsFactory: awsFunctionsFactory,
-      repoFunctionsFactory: repoFunctionsFactory,
-      globalValuesFactory: globalValuesFactory,
-      github: github,
-      gitlab: gitlab,
-      build_id: build_id,
-      jenkinsctrl_node_label: jenkinsctrl_node_label,
-      account: account,
-      project: project
-    )
-    return
+    // fake_smmt_url = build_and_deploy_lambda(
+    //   name: 'Fake SMMT',
+    //   bucket_prefix: bucket_prefix,
+    //   repo: github.fake_smmt.url,
+    //   tf_component: 'fake_smmt',
+    //   code_branch: brach,
+    //   environment: environment,
+    //   awsFunctionsFactory: awsFunctionsFactory,
+    //   repoFunctionsFactory: repoFunctionsFactory,
+    //   globalValuesFactory: globalValuesFactory,
+    //   github: github,
+    //   gitlab: gitlab,
+    //   build_id: build_id,
+    //   jenkinsctrl_node_label: jenkinsctrl_node_label,
+    //   account: account,
+    //   project: project
+    // )
+    // return
     build_and_deploy_lambda(
       name: 'Vehicle Recalls',
       bucket_prefix: bucket_prefix,
