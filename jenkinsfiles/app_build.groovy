@@ -298,7 +298,7 @@ def build_and_deploy_lambda(params) {
               build_number,
               tf_component,
               bucket_prefix,
-              'apply'
+              'plan'
             )
           }
           // return
@@ -357,24 +357,24 @@ node(jenkinsctrl_node_label&&account) {
   }
 
 node('builder') {
-    fake_smmt_url = build_and_deploy_lambda(
-      name: 'Fake SMMT',
-      bucket_prefix: bucket_prefix,
-      repo: github.fake_smmt.url,
-      tf_component: 'fake_smmt',
-      code_branch: brach,
-      environment: environment,
-      awsFunctionsFactory: awsFunctionsFactory,
-      repoFunctionsFactory: repoFunctionsFactory,
-      globalValuesFactory: globalValuesFactory,
-      github: github,
-      gitlab: gitlab,
-      build_id: build_id,
-      jenkinsctrl_node_label: jenkinsctrl_node_label,
-      account: account,
-      project: project
-    )
-    return
+    // fake_smmt_url = build_and_deploy_lambda(
+    //   name: 'Fake SMMT',
+    //   bucket_prefix: bucket_prefix,
+    //   repo: github.fake_smmt.url,
+    //   tf_component: 'fake_smmt',
+    //   code_branch: brach,
+    //   environment: environment,
+    //   awsFunctionsFactory: awsFunctionsFactory,
+    //   repoFunctionsFactory: repoFunctionsFactory,
+    //   globalValuesFactory: globalValuesFactory,
+    //   github: github,
+    //   gitlab: gitlab,
+    //   build_id: build_id,
+    //   jenkinsctrl_node_label: jenkinsctrl_node_label,
+    //   account: account,
+    //   project: project
+    // )
+    // return
     build_and_deploy_lambda(
       name: 'Vehicle Recalls',
       bucket_prefix: bucket_prefix,
