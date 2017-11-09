@@ -4,7 +4,7 @@ data "terraform_remote_state" "fake_smmt" {
   config {
     # bucket = "vehicle-recalls-terraformscaffold-054631451206-eu-west-1"
     bucket = "${format(
-          %s-terraformscaffold-%s-%s,
+          "%s-terraformscaffold-%s-%s",
           var.project,
           var.account,
           data.aws_region.current.name
