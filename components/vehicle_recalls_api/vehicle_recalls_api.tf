@@ -19,3 +19,7 @@ module "vehicle_recalls_api" {
   }
   api_rate_limit_vars       = "${var.api_rate_limit_vars}"
 }
+
+output "api_gateway_url" {
+  value = "${module.vehicle_recalls_api.api_gateway_url}"
+}
