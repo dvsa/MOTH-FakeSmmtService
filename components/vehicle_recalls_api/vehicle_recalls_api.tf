@@ -16,7 +16,7 @@ module "vehicle_recalls_api" {
     SMMT_API_KEY = "localApiKey"
     SERVICE_NAME = "vehicle-recalls"
     SERVICE_ENV = "${var.environment}"
-    RECALL_LOG_LEVEL = "info"
+    RECALL_LOG_LEVEL = "${var.venicle_recalls_log_level}"
   }
   api_rate_limit_vars       = "${var.api_rate_limit_vars}"
 }
