@@ -55,29 +55,9 @@ for (repo in github.keySet()) {
   }
 }
 
+// We will move this to library.
 def log_info(String info) {
   echo "[INFO] ${info}"
-}
-
-def verify_or_create_bucket(String bucket_prefix, String tf_component) {
-  bucket = bucket_prefix + ENV
-
-  if (bucket_exists(bucket) == 1) {
-    log_info("Bucket ${bucket} found")
-  } else {
-    log_info("Bucket ${bucket} not found.")
-    log_info("Creating Bucket")
-
-    node('ctrl' && 'dev') {
-      fetch_infrastructure_code()
-
-      extra_args = "-var environment=${ENV} " +
-        "-var bucket_prefix=${bucket_prefix}"
-
-      tf_scaffold('plan', tf_component, extra_args)
-      tf_scaffold('apply', tf_component, extra_args)
-    }
-  }
 }
 
 Boolean buildNPM(
@@ -223,7 +203,9 @@ node(jenkinsctrl_node_label&&account) {
     }
   }
 
-node('builder') {
+node('builder')
+
+// Cleanup will remove build_and_deploy_lambda. The plan is to have build and deploy definition. 
     fake_smmt_url = build_and_deploy_lambda(
       name: 'Fake SMMT',
       bucket_prefix: bucket_prefix,
