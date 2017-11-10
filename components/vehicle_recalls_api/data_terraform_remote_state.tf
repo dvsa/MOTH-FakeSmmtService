@@ -9,7 +9,7 @@ data "terraform_remote_state" "fake_smmt" {
           var.account_id,
           data.aws_region.current.name
         )}"
-    # key = "vehicle-recalls/054631451206/eu-west-1/dawidm/fake_smmt.tfstate"
+    # key = "vehicle-recalls/054631451206/eu-west-1/int/fake_smmt.tfstate"
     key = "${format(
       "%s/%s/%s/%s/%s.tfstate",
       var.project,
