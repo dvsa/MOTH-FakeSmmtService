@@ -9,7 +9,7 @@ def globalValuesFactory  = new GlobalValues()
 
 
 // This should be a parameter to the pipeline
-String environment            = 'dawidm'
+String environment            = 'int'
 String account                = 'dev'
 
 // Static stuff
