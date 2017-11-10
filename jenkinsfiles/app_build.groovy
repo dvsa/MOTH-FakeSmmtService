@@ -95,7 +95,7 @@ def build_and_deploy_lambda(params) {
   def awsFunctionsFactory       = params.awsFunctionsFactory
   def globalValuesFactory       = params.globalValuesFactory
   String dist_file
-  tfvars = params.tfvars
+  // Some cleanup
   log_info("========================")
   log_info("name: ${name}")
   log_info("repo: ${repo}")
@@ -103,16 +103,15 @@ def build_and_deploy_lambda(params) {
   log_info("code_branch: ${code_branch}")
   log_info("bucket_prefix: ${bucket_prefix}")
   log_info("bucket: ${bucket}")
-  log_info("tfvars: ${tfvars}")
   log_info("repo: ${repo}")
-  String repoDir = repo.substring(repo.lastIndexOf("/")).replaceAll('/','')
+  String repoDir = repo.substring(repo.lastIndexOf("/")).replaceAll('/','') // This is important dont cleanup this
   log_info("${repoDir}")
   log_info("========================")
   stage('Build ' + name) {
     repoFunctionsFactory.checkoutGitRepo(
       repo,
-      'master', // Change that to branch after tests
-      repoDir, // We will agree together on the naming - probably we will use gitlab.infastructure.name
+      'master', // Change that to branch after tests - during pipeline development i wantedo to use the latest master.
+      repoDir,
       globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
     )
     dir(repoDir) {
@@ -195,7 +194,7 @@ node(jenkinsctrl_node_label&&account) {
               build_number,
               's3',
               bucket_prefix,
-              'apply' // When devs agree on this change we will change plan to apply.
+              'apply'
             )
           }
         }
