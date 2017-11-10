@@ -21,14 +21,41 @@ variable "lambda_env_vars" {
   default = {}
 }
 
-/*
-  Sample map with quota and rate limit:
-  {
-    "quota_monthly" = 2500000
-    "burst_limit" = 40
-    "rate_limit" = 2
-  }
-*/
+variable "lambda_publish" {
+  type        = "string"
+  description = "Lambda publish switch"
+}
+
+variable "lambda_memory_size" {
+  type        = "string"
+  description = "Amount of memory in MB Lambda Function can use at runtime"
+}
+
+variable "lambda_timeout" {
+  type        = "string"
+  description = "The amount of time Lambda Function has to run in seconds"
+}
+
+variable "lambda_ver" {
+  type        = "string"
+  description = "Lambda function version"
+}
+
+variable "lambda_function_name" {
+  type        = "string"
+  description = "Function name"
+}
+
+variable "lambda_handler" {
+  type        = "string"
+  description = "Lambda Handler name"
+}
+
+variable "lambda_s3_key" {
+  type        = "string"
+  description = "Lambda S3 Key"
+}
+
 variable "api_rate_limit_vars" {
   type    = "map"
   default = {}

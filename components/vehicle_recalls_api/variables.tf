@@ -3,11 +3,6 @@ variable "aws_region" {
   default = "eu-west-1"
 }
 
-variable "project" {
-  type    = "string"
-  default = "vehicle_recalls"
-}
-
 variable "bucket_prefix" {
   type  = "string"
 }
@@ -27,6 +22,21 @@ variable "lambda_env_vars" {
     "SMMT_API_URI" = "https://o2jf3z94li.execute-api.eu-west-2.amazonaws.com/dev/vincheck"
     "SMMT_API_KEY" = "localApiKey"
   }
+}
+
+variable "account_id" {
+  type = "string"
+  default = "Account ID where we are creating resources"
+}
+
+variable "project" {
+  type = "string"
+  default = "Account ID where we are creating resources"
+}
+
+variable "fake_smmt_component_name" {
+  type = "string"
+  default = "Optional fake smmt component"
 }
 
 variable "api_rate_limit_vars" {
