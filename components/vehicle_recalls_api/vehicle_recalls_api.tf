@@ -17,6 +17,5 @@ module "vehicle_recalls_api" {
     SERVICE_NAME = "vehicle-recalls"
     SERVICE_ENV = "${var.environment}"
   }
-  lambda_env_vars           = "${var.lambda_env_vars}"
   api_rate_limit_vars       = "${var.api_rate_limit_vars}"
 }
