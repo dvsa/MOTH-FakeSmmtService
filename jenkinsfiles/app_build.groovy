@@ -203,9 +203,9 @@ node(jenkinsctrl_node_label&&account) {
     }
   }
 
-node('builder')
+node('builder') {
 
-// Cleanup will remove build_and_deploy_lambda. The plan is to have build and deploy definition. 
+// Cleanup will remove build_and_deploy_lambda. The plan is to have build and deploy definition.
     fake_smmt_url = build_and_deploy_lambda(
       name: 'Fake SMMT',
       bucket_prefix: bucket_prefix,
