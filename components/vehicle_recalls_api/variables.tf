@@ -11,6 +11,10 @@ variable "environment" {
   type = "string"
 }
 
+variable "vehicle_recalls_log_level" {
+  type = "string"
+}
+
 variable "lambda_s3_key" {
   type    = "string"
   default = "default, when I am only creating bucket, I don't need it"
