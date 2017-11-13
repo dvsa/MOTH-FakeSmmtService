@@ -12,7 +12,7 @@ String environment = 'int'
 String account = 'dev'
 
 // Static stuff
-String project = 'vehicle-recalls'
+String project = 'vrec'
 String jenkinsctrl_node_label = 'ctrl'
 String brach = params.BRANCH
 String build_id = env.BUILD_NUMBER
