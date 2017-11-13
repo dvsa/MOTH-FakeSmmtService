@@ -1,4 +1,4 @@
-environment = "marcind"
+environment = "szymonf"
 bucket_prefix = "uk.gov.dvsa.vehicle-recalls."
 
 vehicle_recalls_api_smmt_api_key = "localApiKey"
