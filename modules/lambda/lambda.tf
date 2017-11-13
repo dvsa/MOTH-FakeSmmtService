@@ -11,7 +11,7 @@ resource "aws_lambda_function" "lambda" {
   timeout       = "${var.lambda_timeout}"
 
   environment {
-    variables = "${merge(var.lambda_env_vars, var.lambda_env_vars_dynamic)}"
+    variables = "${var.lambda_env_vars}"
   }
 
   depends_on = ["aws_api_gateway_rest_api.api"]
@@ -75,11 +75,6 @@ variable "lambda_s3_key" {
 }
 
 variable "lambda_env_vars" {
-  type    = "map"
-  default = {}
-}
-
-variable "lambda_env_vars_dynamic" {
   type    = "map"
   default = {}
 }

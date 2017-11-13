@@ -8,7 +8,7 @@ def repoFunctionsFactory = new RepoFunctions()
 def globalValuesFactory = new GlobalValues()
 
 // This should be a parameter to the pipeline
-String environment = 'int'
+String environment = 'szymonf'
 String account = 'dev'
 
 // Static stuff
@@ -165,16 +165,13 @@ def stage_tf_plan_and_apply(params) {
           fake_smmt_dist = fix_dist_path(fake_smmt_dist)
           vehicle_recalls_api_dist = fix_dist_path(vehicle_recalls_api_dist)
 
-          populate_tfvars("fake_smmt_lambda_s3_key", fake_smmt_dist, environment, globalValuesFactory.AWS_REGION)
-          populate_tfvars("vehicle_recalls_api_lambda_s3_key", vehicle_recalls_api_dist, environment, globalValuesFactory.AWS_REGION)
-
           dir(gitlab.infastructure.name) {
             awsFunctionsFactory.terraformScaffold(
               project,
               environment,
               account,
               globalValuesFactory.AWS_REGION,
-              "",
+              "-var fake_smmt_lambda_s3_key=${fake_smmt_dist} -var vehicle_recalls_api_lambda_s3_key=${vehicle_recalls_api_dist}",
               'terraform_plan',
               build_number,
               tf_component,

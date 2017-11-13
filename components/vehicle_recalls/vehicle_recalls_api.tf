@@ -11,9 +11,12 @@ module "vehicle_recalls_api" {
   lambda_memory_size        = "256"
   lambda_timeout            = "15"
   lambda_ver                = "$LATEST"
-  lambda_env_vars           = "${var.vehicle_recalls_api_lambda_env_vars}"
-  lambda_env_vars_dynamic   = {
-    "SMMT_API_URI" = "${module.fake_smmt.api_gateway_url}/vincheck"
+  lambda_env_vars           = {
+    SMMT_API_URI = "${module.fake_smmt.api_gateway_url}/vincheck"
+    SMMT_API_KEY = "${var.vehicle_recalls_api_smmt_api_key}",
+    SERVICE_NAME = "${var.vehicle_recalls_api_service_name}",
+    SERVICE_ENV = "${var.environment}",
+    RECALL_LOG_LEVEL = "${var.vehicle_recalls_log_level}",
   }
   api_rate_limit_vars       = "${var.vehicle_recalls_api_rate_limit_vars}"
 }
@@ -21,6 +24,16 @@ module "vehicle_recalls_api" {
 variable "vehicle_recalls_api_lambda_s3_key" {
   type    = "string"
   default = "default, when I am only creating bucket, I don't need it"
+}
+
+variable "vehicle_recalls_api_service_name" {
+  type    = "string"
+  default = "Service name"
+}
+
+variable "vehicle_recalls_api_smmt_api_key" {
+  type    = "string"
+  default = "SMMT API key"
 }
 
 variable "vehicle_recalls_api_rate_limit_vars" {
@@ -32,12 +45,8 @@ variable "vehicle_recalls_api_rate_limit_vars" {
   }
 }
 
-variable "vehicle_recalls_api_lambda_env_vars" {
-  type    = "map"
-  default = {
-    "SMMT_API_URI" = "https://o2jf3z94li.execute-api.eu-west-2.amazonaws.com/dev/vincheck"
-    "SMMT_API_KEY" = "localApiKey"
-  }
+variable "vehicle_recalls_log_level" {
+  type = "string"
 }
 
 output "vehicle_recalls_api_gateway_url" {
