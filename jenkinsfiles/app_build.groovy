@@ -13,6 +13,7 @@ String account = 'dev'
 
 // Static stuff
 String project = 'vehicle-recalls'
+String s3_repo_bucket_prefix = 'uk.gov.dvsa.vrec.'
 String jenkinsctrl_node_label = 'ctrl'
 String brach = params.BRANCH
 String build_id = env.BUILD_NUMBER
@@ -117,7 +118,7 @@ def stage_build_and_upload_js(params) {
         dist_file = sh(script: "find . -type f -name \'*-${build_id}.zip\'", returnStdout: true).trim()
         log_info("Found: ${dist_file}")
         awsFunctionsFactory.copyToS3(
-          "uk.gov.dvsa.vehicle-recalls.${environment}",
+          "${s3_repo_bucket_prefix}${environment}",
           dist_file,
           'FB_AWS_CREDENTIALS'
         )
