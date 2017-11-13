@@ -4,7 +4,7 @@ module "vehicle_recalls_api" {
   project                   = "${var.project}"                                # has default value
   bucket_prefix             = "${var.bucket_prefix}"                          # has default value
   environment               = "${var.environment}"
-  lambda_s3_key             = "${var.vehicle_recalls_lambda_s3_key}"
+  lambda_s3_key             = "${var.vehicle_recalls_api_lambda_s3_key}"
   lambda_function_name      = "vehicle-recalls-api"
   lambda_handler            = "src/main.handler"
   lambda_publish            = "true"
@@ -13,12 +13,12 @@ module "vehicle_recalls_api" {
   lambda_ver                = "$LATEST"
   lambda_env_vars           = "${var.vehicle_recalls_api_lambda_env_vars}"
   lambda_env_vars_dynamic   = {
-    "SMMT_API_URI" = "${module.fake_smmt.api_gateway_url}"
+    "SMMT_API_URI" = "${module.fake_smmt.api_gateway_url}/vincheck"
   }
   api_rate_limit_vars       = "${var.vehicle_recalls_api_rate_limit_vars}"
 }
 
-variable "vehicle_recalls_lambda_s3_key" {
+variable "vehicle_recalls_api_lambda_s3_key" {
   type    = "string"
   default = "default, when I am only creating bucket, I don't need it"
 }
@@ -42,4 +42,8 @@ variable "vehicle_recalls_api_lambda_env_vars" {
 
 output "vehicle_recalls_api_gateway_url" {
   value = "${module.vehicle_recalls_api.api_gateway_url}"
+}
+
+output "vehicle_recalls_api_key" {
+  value = "${module.vehicle_recalls_api.api_key}"
 }

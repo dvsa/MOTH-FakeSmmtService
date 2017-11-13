@@ -186,3 +186,7 @@ resource "aws_api_gateway_usage_plan_key" "plan_api_key" {
 output "api_gateway_url" {
   value = "https://${aws_api_gateway_deployment.api.rest_api_id}.execute-api.${var.aws_region}.amazonaws.com/${aws_api_gateway_deployment.api.stage_name}"
 }
+
+output "api_key" {
+  value = "${aws_api_gateway_api_key.api_key.value}"
+}
