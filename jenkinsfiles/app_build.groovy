@@ -8,7 +8,7 @@ def repoFunctionsFactory = new RepoFunctions()
 def globalValuesFactory = new GlobalValues()
 
 // This should be a parameter to the pipeline
-String environment = 'szymonf'
+String environment = 'int'
 String account = 'dev'
 
 // Static stuff

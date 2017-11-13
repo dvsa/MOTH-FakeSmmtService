@@ -13,19 +13,3 @@ module "fake_smmt" {
   lambda_ver                = "$LATEST"
   lambda_env_vars           = "${var.fake_smmt_lambda_env_vars}"
 }
-
-variable "fake_smmt_lambda_s3_key" {
-  type    = "string"
-  default = "default, when I am only creating bucket, I don't need it"
-}
-
-variable "fake_smmt_lambda_env_vars" {
-  type    = "map"
-  default = {
-    "default" = "default"
-  }
-}
-
-output "fake_smmt_api_gateway_url" {
-  value = "${module.fake_smmt.api_gateway_url}"
-}
