@@ -119,7 +119,7 @@ def stage_build_and_upload_js(params) {
         awsFunctionsFactory.copyToS3(
           "uk.gov.dvsa.vrec.${environment}",
           dist_file,
-          'FB_AWS_CREDENTIALS'
+          'PRD_ANSIBLE_AWS_CREDENTIALS'
         )
         return dist_file
       }
@@ -223,7 +223,7 @@ node(jenkinsctrl_node_label && account) {
             build_number,
             's3',
             bucket_prefix,
-            'plan'
+            'apply'
           )
         }
       }
@@ -231,64 +231,64 @@ node(jenkinsctrl_node_label && account) {
   }
 }
 
-// node('builder') {
-// // Cleanup will remove build_and_deploy_lambda. The plan is to have build and deploy definition.
-//   fake_smmt_dist = stage_build_and_upload_js(
-//     name: 'Fake SMMT',
-//     bucket_prefix: bucket_prefix,
-//     repo: github.fake_smmt.url,
-//     tf_component: 'fake_smmt',
-//     code_branch: brach,
-//     environment: environment,
-//     awsFunctionsFactory: awsFunctionsFactory,
-//     repoFunctionsFactory: repoFunctionsFactory,
-//     globalValuesFactory: globalValuesFactory,
-//     github: github,
-//     gitlab: gitlab,
-//     build_id: build_id,
-//     jenkinsctrl_node_label: jenkinsctrl_node_label,
-//     account: account,
-//     project: project
-//   )
-//   log_info(fake_smmt_dist)
-//
-//   log_info(gitlab.infastructure.name)
-//
-//   vehicle_recalls_api_dist = stage_build_and_upload_js(
-//     name: 'Vehicle Recalls API',
-//     bucket_prefix: bucket_prefix,
-//     repo: github.vehicle_recalls_api.url,
-//     tf_component: 'vehicle_recalls_api',
-//     code_branch: brach,
-//     environment: environment,
-//     awsFunctionsFactory: awsFunctionsFactory,
-//     repoFunctionsFactory: repoFunctionsFactory,
-//     globalValuesFactory: globalValuesFactory,
-//     github: github,
-//     gitlab: gitlab,
-//     build_id: build_id,
-//     jenkinsctrl_node_label: jenkinsctrl_node_label,
-//     account: account,
-//     project: project
-//   )
-//
-//   log_info(gitlab.infastructure.name)
-//
-//   log_info(vehicle_recalls_api_dist)
-//
-//   stage_tf_plan_and_apply(
-//     name: "Vehicle Recalls",
-//     bucket_prefix: bucket_prefix,
-//     tf_component: "vehicle_recalls",
-//     fake_smmt_dist: fake_smmt_dist,
-//     vehicle_recalls_api_dist: vehicle_recalls_api_dist,
-//     jenkinsctrl_node_label: jenkinsctrl_node_label,
-//     gitlab: gitlab,
-//     account: account,
-//     project: project,
-//     environment: environment,
-//     awsFunctionsFactory: awsFunctionsFactory,
-//     repoFunctionsFactory: repoFunctionsFactory,
-//     globalValuesFactory: globalValuesFactory
-//   )
-// }
+node('builder') {
+// Cleanup will remove build_and_deploy_lambda. The plan is to have build and deploy definition.
+  fake_smmt_dist = stage_build_and_upload_js(
+    name: 'Fake SMMT',
+    bucket_prefix: bucket_prefix,
+    repo: github.fake_smmt.url,
+    tf_component: 'fake_smmt',
+    code_branch: brach,
+    environment: environment,
+    awsFunctionsFactory: awsFunctionsFactory,
+    repoFunctionsFactory: repoFunctionsFactory,
+    globalValuesFactory: globalValuesFactory,
+    github: github,
+    gitlab: gitlab,
+    build_id: build_id,
+    jenkinsctrl_node_label: jenkinsctrl_node_label,
+    account: account,
+    project: project
+  )
+  log_info(fake_smmt_dist)
+
+  log_info(gitlab.infastructure.name)
+
+  vehicle_recalls_api_dist = stage_build_and_upload_js(
+    name: 'Vehicle Recalls API',
+    bucket_prefix: bucket_prefix,
+    repo: github.vehicle_recalls_api.url,
+    tf_component: 'vehicle_recalls_api',
+    code_branch: brach,
+    environment: environment,
+    awsFunctionsFactory: awsFunctionsFactory,
+    repoFunctionsFactory: repoFunctionsFactory,
+    globalValuesFactory: globalValuesFactory,
+    github: github,
+    gitlab: gitlab,
+    build_id: build_id,
+    jenkinsctrl_node_label: jenkinsctrl_node_label,
+    account: account,
+    project: project
+  )
+
+  log_info(gitlab.infastructure.name)
+
+  log_info(vehicle_recalls_api_dist)
+
+  stage_tf_plan_and_apply(
+    name: "Vehicle Recalls",
+    bucket_prefix: bucket_prefix,
+    tf_component: "vehicle_recalls",
+    fake_smmt_dist: fake_smmt_dist,
+    vehicle_recalls_api_dist: vehicle_recalls_api_dist,
+    jenkinsctrl_node_label: jenkinsctrl_node_label,
+    gitlab: gitlab,
+    account: account,
+    project: project,
+    environment: environment,
+    awsFunctionsFactory: awsFunctionsFactory,
+    repoFunctionsFactory: repoFunctionsFactory,
+    globalValuesFactory: globalValuesFactory
+  )
+}
