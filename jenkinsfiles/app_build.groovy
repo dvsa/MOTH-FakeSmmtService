@@ -9,7 +9,7 @@ def globalValuesFactory = new GlobalValues()
 
 // This should be a parameter to the pipeline
 String environment = 'int'
-String account = 'dev'
+String account = 'test'
 
 // Static stuff
 String project = 'vehicle-recalls'
@@ -119,7 +119,7 @@ def stage_build_and_upload_js(params) {
         awsFunctionsFactory.copyToS3(
           "uk.gov.dvsa.vrec.${environment}",
           dist_file,
-          'FB_AWS_CREDENTIALS'
+          'PRD_ANSIBLE_AWS_CREDENTIALS'
         )
         return dist_file
       }
