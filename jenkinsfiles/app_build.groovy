@@ -276,19 +276,19 @@ node('builder') {
 
   log_info(vehicle_recalls_api_dist)
 
-  stage_tf_plan_and_apply(
-    name: "Vehicle Recalls",
-    bucket_prefix: bucket_prefix,
-    tf_component: "vehicle_recalls",
-    fake_smmt_dist: fake_smmt_dist,
-    vehicle_recalls_api_dist: vehicle_recalls_api_dist,
-    jenkinsctrl_node_label: jenkinsctrl_node_label,
-    gitlab: gitlab,
-    account: account,
-    project: project,
-    environment: environment,
-    awsFunctionsFactory: awsFunctionsFactory,
-    repoFunctionsFactory: repoFunctionsFactory,
-    globalValuesFactory: globalValuesFactory
-  )
+  // stage_tf_plan_and_apply(
+  //   name: "Vehicle Recalls",
+  //   bucket_prefix: bucket_prefix,
+  //   tf_component: "vehicle_recalls",
+  //   fake_smmt_dist: fake_smmt_dist,
+  //   vehicle_recalls_api_dist: vehicle_recalls_api_dist,
+  //   jenkinsctrl_node_label: jenkinsctrl_node_label,
+  //   gitlab: gitlab,
+  //   account: account,
+  //   project: project,
+  //   environment: environment,
+  //   awsFunctionsFactory: awsFunctionsFactory,
+  //   repoFunctionsFactory: repoFunctionsFactory,
+  //   globalValuesFactory: globalValuesFactory
+  // )
 }
