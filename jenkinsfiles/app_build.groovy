@@ -233,6 +233,8 @@ node(jenkinsctrl_node_label && account) {
 
 node('builder') {
 // Cleanup will remove build_and_deploy_lambda. The plan is to have build and deploy definition.
+
+  deleteDir()
   fake_smmt_dist = stage_build_and_upload_js(
     name: 'Fake SMMT',
     bucket_prefix: bucket_prefix,
