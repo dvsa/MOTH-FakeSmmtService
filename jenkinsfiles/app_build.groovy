@@ -119,7 +119,7 @@ def stage_build_and_upload_js(params) {
         awsFunctionsFactory.copyToS3(
           "uk.gov.dvsa.vrec.${environment}",
           dist_file,
-          'PRD_ANSIBLE_AWS_CREDENTIALS'
+          'MOT_TEST_AWS_CREDENTIALS'
         )
         return dist_file
       }
