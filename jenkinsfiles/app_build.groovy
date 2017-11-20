@@ -119,7 +119,7 @@ def stage_build_and_upload_js(params) {
         awsFunctionsFactory.copyToS3(
           "uk.gov.dvsa.vrec.${environment}",
           dist_file,
-          'PRD_ANSIBLE_AWS_CREDENTIALS'
+          'MOT_TEST_AWS_CREDENTIALS'
         )
         return dist_file
       }
@@ -233,6 +233,8 @@ node(jenkinsctrl_node_label && account) {
 
 node('builder') {
 // Cleanup will remove build_and_deploy_lambda. The plan is to have build and deploy definition.
+
+  deleteDir()
   fake_smmt_dist = stage_build_and_upload_js(
     name: 'Fake SMMT',
     bucket_prefix: bucket_prefix,
@@ -276,19 +278,19 @@ node('builder') {
 
   log_info(vehicle_recalls_api_dist)
 
-  // stage_tf_plan_and_apply(
-  //   name: "Vehicle Recalls",
-  //   bucket_prefix: bucket_prefix,
-  //   tf_component: "vehicle_recalls",
-  //   fake_smmt_dist: fake_smmt_dist,
-  //   vehicle_recalls_api_dist: vehicle_recalls_api_dist,
-  //   jenkinsctrl_node_label: jenkinsctrl_node_label,
-  //   gitlab: gitlab,
-  //   account: account,
-  //   project: project,
-  //   environment: environment,
-  //   awsFunctionsFactory: awsFunctionsFactory,
-  //   repoFunctionsFactory: repoFunctionsFactory,
-  //   globalValuesFactory: globalValuesFactory
-  // )
+  stage_tf_plan_and_apply(
+    name: "Vehicle Recalls",
+    bucket_prefix: bucket_prefix,
+    tf_component: "vehicle_recalls",
+    fake_smmt_dist: fake_smmt_dist,
+    vehicle_recalls_api_dist: vehicle_recalls_api_dist,
+    jenkinsctrl_node_label: jenkinsctrl_node_label,
+    gitlab: gitlab,
+    account: account,
+    project: project,
+    environment: environment,
+    awsFunctionsFactory: awsFunctionsFactory,
+    repoFunctionsFactory: repoFunctionsFactory,
+    globalValuesFactory: globalValuesFactory
+  )
 }
