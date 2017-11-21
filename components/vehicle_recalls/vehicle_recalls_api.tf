@@ -9,7 +9,7 @@ module "vehicle_recalls_api" {
   lambda_handler            = "src/main.handler"
   lambda_publish            = "true"
   lambda_memory_size        = "256"
-  lambda_timeout            = "15"
+  lambda_timeout            = "${var.vehicle_recalls_api_timeout}"
   lambda_ver                = "$LATEST"
   lambda_env_vars           = {
     SMMT_API_URI = "${module.fake_smmt.api_gateway_url}/vincheck"
