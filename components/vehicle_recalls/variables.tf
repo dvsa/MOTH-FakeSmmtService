@@ -55,3 +55,8 @@ variable "vehicle_recalls_api_rate_limit_vars" {
 variable "vehicle_recalls_log_level" {
   type = "string"
 }
+
+variable "vehicle_recalls_api_timeout" {
+  type    = "string"
+  default = "15"
+}
