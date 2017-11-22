@@ -9,7 +9,7 @@ globalValuesFactory = new GlobalValues()
 
 // This should be a parameter to the pipeline
 environment = 'int'
-account = 'test'
+account = params.AWS_ACCOUNT
 
 // Static stuff
 project = 'vehicle-recalls'
