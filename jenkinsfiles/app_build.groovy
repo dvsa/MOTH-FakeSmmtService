@@ -3,41 +3,42 @@ import dvsa.aws.mot.jenkins.pipeline.common.AWSFunctions
 import dvsa.aws.mot.jenkins.pipeline.common.RepoFunctions
 import dvsa.aws.mot.jenkins.pipeline.common.GlobalValues
 
-def awsFunctionsFactory = new AWSFunctions()
-def repoFunctionsFactory = new RepoFunctions()
-def globalValuesFactory = new GlobalValues()
+awsFunctionsFactory = new AWSFunctions()
+repoFunctionsFactory = new RepoFunctions()
+globalValuesFactory = new GlobalValues()
 
 // This should be a parameter to the pipeline
-String environment = 'int'
-String account = 'test'
+environment = 'int'
+account = 'test'
 
 // Static stuff
-String project = 'vehicle-recalls'
-String jenkinsctrl_node_label = 'ctrl'
-String brach = params.BRANCH
-String build_id = env.BUILD_NUMBER
+project = 'vehicle-recalls'
+jenkinsctrl_node_label = 'ctrl'
+build_branch = params.BRANCH
+action = params.ACTION
+build_id = env.BUILD_NUMBER
 
 // Pipeline specific data
-String bucket_prefix = 'terraformscaffold'
+bucket_prefix = 'terraformscaffold'
 
-Map<String, Map<String, String>> gitlab = [
+gitlab = [
   infastructure: [
     group : 'vehicle-recalls',
     name  : 'recalls-infrastructure',
-    branch: branch
+    branch: build_branch
   ]
 ]
 
-Map<String, Map<String, String>> github = [
-  fake_smmt          : [
+github = [
+  fake_smmt: [
     group : 'dvsa',
     name  : 'vehicle-recalls-fake-smmt-service',
-    branch: branch
+    branch: build_branch
   ],
   vehicle_recalls_api: [
     group : 'dvsa',
     name  : 'vehicle-recalls-api',
-    branch: branch
+    branch: build_branch
   ]
 ]
 
@@ -138,6 +139,7 @@ def stage_tf_plan_and_apply(params) {
   String environment = params.environment
   String project = params.project
   String bucket_prefix = params.bucket_prefix
+  String tf_command = params.tf_command
   def gitlab = params.gitlab
 
   log_info(gitlab.infastructure.name)
@@ -146,7 +148,7 @@ def stage_tf_plan_and_apply(params) {
   def awsFunctionsFactory = params.awsFunctionsFactory
   def globalValuesFactory = params.globalValuesFactory
 
-  stage('TF Plan & Apply ' + name) {
+  stage('TF tf_component:' + tf_component + ', action:' + params.tf_command) {
     wrap([
       $class: 'TimestamperBuildWrapper'
     ]) {
@@ -162,9 +164,6 @@ def stage_tf_plan_and_apply(params) {
             globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
           )
 
-          fake_smmt_dist = fix_dist_path(fake_smmt_dist)
-          vehicle_recalls_api_dist = fix_dist_path(vehicle_recalls_api_dist)
-
           dir(gitlab.infastructure.name) {
             awsFunctionsFactory.terraformScaffold(
               project,
@@ -176,7 +175,7 @@ def stage_tf_plan_and_apply(params) {
               build_number,
               tf_component,
               bucket_prefix,
-              'apply'
+              tf_command
             )
           }
         }
@@ -189,94 +188,99 @@ def fix_dist_path(dist_path) {
   return dist_path.substring(dist_path.lastIndexOf("/")).replaceAll('/', '')
 }
 
-def populate_tfvars(key, value, environment, region) {
-  log_info("Populating tfvars \"${key}\" with \"${value}\"")
+def s3_bucket_repo(params) {
 
-  tfvars_path = "env_${region}_${environment}.tfvars"
+  String tf_command = params.tf_command
+  node(jenkinsctrl_node_label && account) {
+    deleteDir();
 
-  sh("sed -i 's|%${key}%|${value}|g' recalls-infrastructure/etc/${tfvars_path}")
-}
-
-node(jenkinsctrl_node_label && account) {
-  stage('Verify S3 Bucket') {
-    wrap([
-      $class: 'TimestamperBuildWrapper'
-    ]) {
+    stage('S3 repo Bucket: ' + tf_command) {
       wrap([
-        $class      : 'AnsiColorBuildWrapper',
-        colorMapName: 'xterm'
+        $class: 'TimestamperBuildWrapper'
       ]) {
-        repoFunctionsFactory.checkoutGitRepo(
-          gitlab.infastructure.url,
-          gitlab.infastructure.branch,
-          gitlab.infastructure.name,
-          globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
-        )
-        dir(gitlab.infastructure.name) {
-          awsFunctionsFactory.terraformScaffold(
-            project,
-            environment,
-            account,
-            globalValuesFactory.AWS_REGION,
-            '',    // I'm not passing any extra args - lets keep this generic
-            'terraform_plan',
-            build_number,
-            's3',
-            bucket_prefix,
-            'apply'
+        wrap([
+          $class      : 'AnsiColorBuildWrapper',
+          colorMapName: 'xterm'
+        ]) {
+          repoFunctionsFactory.checkoutGitRepo(
+            gitlab.infastructure.url,
+            gitlab.infastructure.branch,
+            gitlab.infastructure.name,
+            globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
           )
+          dir(gitlab.infastructure.name) {
+            awsFunctionsFactory.terraformScaffold(
+              project,
+              environment,
+              account,
+              globalValuesFactory.AWS_REGION,
+              '',    // I'm not passing any extra args - lets keep this generic
+              'terraform_plan',
+              build_id,
+              's3',
+              bucket_prefix,
+              params.tf_command
+            )
+          }
         }
       }
     }
   }
 }
 
+if(action == 'apply') s3_bucket_repo(tf_command: action)
+
 node('builder') {
 // Cleanup will remove build_and_deploy_lambda. The plan is to have build and deploy definition.
 
   deleteDir()
-  fake_smmt_dist = stage_build_and_upload_js(
-    name: 'Fake SMMT',
-    bucket_prefix: bucket_prefix,
-    repo: github.fake_smmt.url,
-    tf_component: 'fake_smmt',
-    code_branch: brach,
-    environment: environment,
-    awsFunctionsFactory: awsFunctionsFactory,
-    repoFunctionsFactory: repoFunctionsFactory,
-    globalValuesFactory: globalValuesFactory,
-    github: github,
-    gitlab: gitlab,
-    build_id: build_id,
-    jenkinsctrl_node_label: jenkinsctrl_node_label,
-    account: account,
-    project: project
-  )
-  log_info(fake_smmt_dist)
+  String fake_smmt_dist
+  String vehicle_recalls_api_dist
 
-  log_info(gitlab.infastructure.name)
+  if(action == 'apply') {
+    fake_smmt_dist = stage_build_and_upload_js(
+      name: 'Fake SMMT',
+      bucket_prefix: bucket_prefix,
+      repo: github.fake_smmt.url,
+      tf_component: 'fake_smmt',
+      code_branch: build_branch,
+      environment: environment,
+      awsFunctionsFactory: awsFunctionsFactory,
+      repoFunctionsFactory: repoFunctionsFactory,
+      globalValuesFactory: globalValuesFactory,
+      github: github,
+      gitlab: gitlab,
+      build_id: build_id,
+      jenkinsctrl_node_label: jenkinsctrl_node_label,
+      account: account,
+      project: project
+    )
+    log_info(fake_smmt_dist)
 
-  vehicle_recalls_api_dist = stage_build_and_upload_js(
-    name: 'Vehicle Recalls API',
-    bucket_prefix: bucket_prefix,
-    repo: github.vehicle_recalls_api.url,
-    tf_component: 'vehicle_recalls_api',
-    code_branch: brach,
-    environment: environment,
-    awsFunctionsFactory: awsFunctionsFactory,
-    repoFunctionsFactory: repoFunctionsFactory,
-    globalValuesFactory: globalValuesFactory,
-    github: github,
-    gitlab: gitlab,
-    build_id: build_id,
-    jenkinsctrl_node_label: jenkinsctrl_node_label,
-    account: account,
-    project: project
-  )
+    log_info(gitlab.infastructure.name)
 
-  log_info(gitlab.infastructure.name)
+    vehicle_recalls_api_dist = stage_build_and_upload_js(
+      name: 'Vehicle Recalls API',
+      bucket_prefix: bucket_prefix,
+      repo: github.vehicle_recalls_api.url,
+      tf_component: 'vehicle_recalls_api',
+      code_branch: build_branch,
+      environment: environment,
+      awsFunctionsFactory: awsFunctionsFactory,
+      repoFunctionsFactory: repoFunctionsFactory,
+      globalValuesFactory: globalValuesFactory,
+      github: github,
+      gitlab: gitlab,
+      build_id: build_id,
+      jenkinsctrl_node_label: jenkinsctrl_node_label,
+      account: account,
+      project: project
+    )
 
-  log_info(vehicle_recalls_api_dist)
+    fake_smmt_dist = fix_dist_path(fake_smmt_dist)
+    vehicle_recalls_api_dist = fix_dist_path(vehicle_recalls_api_dist)
+    log_info(vehicle_recalls_api_dist)
+  }
 
   stage_tf_plan_and_apply(
     name: "Vehicle Recalls",
@@ -291,6 +295,9 @@ node('builder') {
     environment: environment,
     awsFunctionsFactory: awsFunctionsFactory,
     repoFunctionsFactory: repoFunctionsFactory,
-    globalValuesFactory: globalValuesFactory
+    globalValuesFactory: globalValuesFactory,
+    tf_command: action
   )
+
+  if(action == 'destroy') s3_bucket_repo(tf_command: action)
 }
