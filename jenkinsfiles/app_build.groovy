@@ -8,7 +8,7 @@ repoFunctionsFactory = new RepoFunctions()
 globalValuesFactory = new GlobalValues()
 
 // This should be a parameter to the pipeline
-environment = 'int'
+environment = params.ENVIRONMENT
 account = params.AWS_ACCOUNT
 
 // Static stuff
