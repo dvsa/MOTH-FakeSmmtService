@@ -7,15 +7,19 @@ awsFunctionsFactory = new AWSFunctions()
 repoFunctionsFactory = new RepoFunctions()
 globalValuesFactory = new GlobalValues()
 
-// This should be a parameter to the pipeline
+// These should be a parameter to the pipeline
 environment = params.ENVIRONMENT
 account = params.AWS_ACCOUNT
+build_branch = params.BRANCH
+action = params.ACTION
+
+accountCreds = [ dev : 'FB_AWS_CREDENTIALS', test: 'MOT_TEST_AWS_CREDENTIALS']
+targetAccountCreds = accountCreds[account]
 
 // Static stuff
 project = 'vehicle-recalls'
 jenkinsctrl_node_label = 'ctrl'
-build_branch = params.BRANCH
-action = params.ACTION
+
 build_id = env.BUILD_NUMBER
 
 // Pipeline specific data
@@ -120,7 +124,7 @@ def stage_build_and_upload_js(params) {
         awsFunctionsFactory.copyToS3(
           "uk.gov.dvsa.vrec.${environment}",
           dist_file,
-          'MOT_TEST_AWS_CREDENTIALS'
+          targetAccountCreds
         )
         return dist_file
       }
