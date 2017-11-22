@@ -10,6 +10,7 @@ const marquesWithRecall = {
     vin: '',
     vin_recall_status: 'BRAKES',
     last_update: '19022015',
+    delay: 0,
   },
   VOLKSWAGEN: {
     status: 201,
@@ -17,6 +18,7 @@ const marquesWithRecall = {
     vin: '',
     vin_recall_status: 'BRAKES',
     last_update: '19022015',
+    delay: 0,
   },
   BMW: {
     status: 200,
@@ -24,6 +26,7 @@ const marquesWithRecall = {
     vin: '',
     vin_recall_status: '',
     last_update: '19022015',
+    delay: 0,
   },
   AUDI: {
     status: 200,
@@ -31,6 +34,23 @@ const marquesWithRecall = {
     vin: '',
     vin_recall_status: '',
     last_update: '19022015',
+    delay: 0,
+  },
+  PEUGEOT: {
+    status: 200,
+    status_description: 'No Recall Outstanding',
+    vin: '',
+    vin_recall_status: '',
+    last_update: '19022015',
+    delay: 16000,
+  },
+  VOLVO: {
+    status: 200,
+    status_description: 'No Recall Outstanding',
+    vin: '',
+    vin_recall_status: '',
+    last_update: '19022015',
+    delay: 3000,
   },
 };
 
@@ -40,6 +60,7 @@ const invalidMarqueTemplate = {
   vin: '',
   vin_recall_status: '',
   last_update: '',
+  delay: 0,
 };
 
 exports.getRecall = (vin, marque) => {
@@ -54,5 +75,7 @@ exports.getRecall = (vin, marque) => {
 
   recall.vin = vin;
 
-  return recall;
+  return new Promise((resolve) => {
+    setTimeout(() => { resolve(recall); }, recall.delay);
+  });
 };
