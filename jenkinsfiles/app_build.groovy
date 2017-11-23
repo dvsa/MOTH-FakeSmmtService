@@ -128,9 +128,9 @@ def stage_build_and_upload_js(params) {
         )
         return dist_file
       }
-      withCredentials([usernamePassword(credentialsId: 'dvsajenkins_github', passwordVariable: 'password', usernameVariable: 'username')]) {
+      withCredentials([usernamePassword(credentialsId: 'dvsajenkins_github', passwordVariable: 'passwordA', usernameVariable: 'usernameA')]) {
         sh """
-           git tag ${build_id}; git push https://${username}:${password}@${repo.ssh_url} ${build_id}
+           git tag ${build_id}; git push https://${usernameA}:${passwordA}@${repo.ssh_url} ${build_id}
         """
       }
     }
