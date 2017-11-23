@@ -56,7 +56,7 @@ for (repo in gitlab.keySet()) {
 for (repo in github.keySet()) {
   if (!github[repo].url) {
     github[repo].url = "https://github.com/${github[repo].group}/${github[repo].name}.git"
-    github[repo].ssh_url = "git@github.com:${github[repo].group}/${github[repo].name}.git"
+    github[repo].ssh_url = "https://dvsajenkins@github.com/${github[repo].group}/${github[repo].name}.git"
   }
 }
 
@@ -128,11 +128,9 @@ def stage_build_and_upload_js(params) {
         )
         return dist_file
       }
-      sshagent(['f8009349-f929-4d7e-9f9e-370f84f9bd1f']) {
         sh """
           git remote set-url --push origin ${repo.ssh_url}; git tag ${build_id}; git push origin ${build_id}
         """
-      }
     }
   }
 }
