@@ -12,6 +12,7 @@ environment = params.ENVIRONMENT
 account = params.AWS_ACCOUNT
 build_branch = params.BRANCH
 action = params.ACTION
+release_version = params.RELEASE_VERSION
 
 accountCreds = [ dev : 'FB_AWS_CREDENTIALS', test: 'MOT_TEST_AWS_CREDENTIALS']
 targetAccountCreds = accountCreds[account]
@@ -20,7 +21,7 @@ targetAccountCreds = accountCreds[account]
 project = 'vehicle-recalls'
 jenkinsctrl_node_label = 'ctrl'
 
-build_id = env.BUILD_NUMBER
+build_number = env.BUILD_NUMBER
 
 // Pipeline specific data
 bucket_prefix = 'terraformscaffold'
@@ -242,6 +243,9 @@ node('builder') {
   String vehicle_recalls_api_dist
 
   if(action == 'apply') {
+
+    String build_id = release_version + '_b' + build_id
+
     fake_smmt_dist = stage_build_and_upload_js(
       name: 'Fake SMMT',
       bucket_prefix: bucket_prefix,
