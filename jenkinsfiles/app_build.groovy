@@ -84,7 +84,7 @@ Boolean buildNPM(
 
 def stage_build_and_upload_js(params) {
   String name = params.name
-  String repo = params.repo
+  def repo = params.repo
   String tf_component = params.tf_component
   String code_branch = params.code_branch
   String bucket_prefix = params.bucket_prefix
