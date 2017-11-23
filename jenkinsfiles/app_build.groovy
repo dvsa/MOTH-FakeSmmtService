@@ -129,7 +129,7 @@ def stage_build_and_upload_js(params) {
         return dist_file
       }
       sh """
-        git remote set-url -all origin ${repo.ssh_url}; git tag ${build_id}; git push origin ${build_id}
+        git remote set-url --push origin ${repo.ssh_url}; git tag ${build_id}; git push origin ${build_id}
       """
     }
   }
