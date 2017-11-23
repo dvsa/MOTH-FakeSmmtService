@@ -56,6 +56,7 @@ for (repo in gitlab.keySet()) {
 for (repo in github.keySet()) {
   if (!github[repo].url) {
     github[repo].url = "https://github.com/${github[repo].group}/${github[repo].name}.git"
+    github[repo].ssh_url = "git@github.com:${github[repo].group}/${github[repo].name}.git"
   }
 }
 
@@ -98,18 +99,16 @@ def stage_build_and_upload_js(params) {
   // Some cleanup
   log_info("========================")
   log_info("name: ${name}")
-  log_info("repo: ${repo}")
   log_info("tf_component: ${tf_component}")
   log_info("code_branch: ${code_branch}")
   log_info("bucket_prefix: ${bucket_prefix}")
   log_info("bucket: ${bucket}")
-  log_info("repo: ${repo}")
   String repoDir = repo.substring(repo.lastIndexOf("/")).replaceAll('/', '') // This is important dont cleanup this
   log_info("${repoDir}")
   log_info("========================")
   stage('Build ' + name) {
     repoFunctionsFactory.checkoutGitRepo(
-      repo,
+      repo.url,
       'master', // Change that to branch after tests - during pipeline development i wantedo to use the latest master.
       repoDir,
       globalValuesFactory.SSH_DEPLOY_GIT_CREDS_ID
@@ -129,6 +128,9 @@ def stage_build_and_upload_js(params) {
         )
         return dist_file
       }
+      sh """
+        git remote set-url -all origin ${repo.ssh_url}; git tag ${build_id}; git push origin ${build_id}
+      """
     }
   }
 }
@@ -249,7 +251,7 @@ node('builder') {
     fake_smmt_dist = stage_build_and_upload_js(
       name: 'Fake SMMT',
       bucket_prefix: bucket_prefix,
-      repo: github.fake_smmt.url,
+      repo: github.fake_smmt,
       tf_component: 'fake_smmt',
       code_branch: build_branch,
       environment: environment,
@@ -270,7 +272,7 @@ node('builder') {
     vehicle_recalls_api_dist = stage_build_and_upload_js(
       name: 'Vehicle Recalls API',
       bucket_prefix: bucket_prefix,
-      repo: github.vehicle_recalls_api.url,
+      repo: github.vehicle_recalls_api,
       tf_component: 'vehicle_recalls_api',
       code_branch: build_branch,
       environment: environment,
