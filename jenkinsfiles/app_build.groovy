@@ -103,7 +103,7 @@ def stage_build_and_upload_js(params) {
   log_info("code_branch: ${code_branch}")
   log_info("bucket_prefix: ${bucket_prefix}")
   log_info("bucket: ${bucket}")
-  String repoDir = repo.url.substring(repo.lastIndexOf("/")).replaceAll('/', '') // This is important dont cleanup this
+  String repoDir = repo.url.substring(repo.url.lastIndexOf("/")).replaceAll('/', '') // This is important dont cleanup this
   log_info("${repoDir}")
   log_info("========================")
   stage('Build ' + name) {
