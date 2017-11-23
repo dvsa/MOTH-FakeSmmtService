@@ -131,7 +131,7 @@ def stage_build_and_upload_js(params) {
       withCredentials([usernamePassword(credentialsId: 'dvsajenkins_github', passwordVariable: 'password', usernameVariable: 'username')]) {
         String gitUrl = repo.ssh_url.replaceAll("##creds##", "${username}:${password}")
         sh """
-          git remote set-url --push origin ${gitUrl}; git tag ${build_id}; git push origin ${build_id}
+          git remote set-url --push origin '${gitUrl}'; git tag ${build_id}; git push origin ${build_id}
         """
       }
     }
