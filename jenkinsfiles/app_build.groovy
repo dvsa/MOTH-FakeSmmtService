@@ -56,7 +56,7 @@ for (repo in gitlab.keySet()) {
 for (repo in github.keySet()) {
   if (!github[repo].url) {
     github[repo].url = "https://github.com/${github[repo].group}/${github[repo].name}.git"
-    github[repo].ssh_url = "https://##creds##@github.com/${github[repo].group}/${github[repo].name}.git"
+    github[repo].ssh_url = "@github.com/${github[repo].group}/${github[repo].name}.git"
   }
 }
 
@@ -129,9 +129,8 @@ def stage_build_and_upload_js(params) {
         return dist_file
       }
       withCredentials([usernamePassword(credentialsId: 'dvsajenkins_github', passwordVariable: 'password', usernameVariable: 'username')]) {
-        String gitUrl = repo.ssh_url.replaceAll("##creds##", "aaa:bbbb")
         sh """
-           git tag ${build_id}; git push ${gitUrl} ${build_id}
+           git tag ${build_id}; git push https://${username}:${password}@${gitUrl} ${build_id}
         """
       }
     }
