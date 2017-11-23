@@ -56,7 +56,7 @@ for (repo in gitlab.keySet()) {
 for (repo in github.keySet()) {
   if (!github[repo].url) {
     github[repo].url = "https://github.com/${github[repo].group}/${github[repo].name}.git"
-    github[repo].ssh_url = "@github.com/${github[repo].group}/${github[repo].name}.git"
+    github[repo].ssh_url = "github.com/${github[repo].group}/${github[repo].name}.git"
   }
 }
 
