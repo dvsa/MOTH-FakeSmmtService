@@ -38,5 +38,17 @@ exports.marque = {
     {
       Name: 'AUDI',
     },
+    {
+      Name: 'SUBARU',
+    },
+    {
+      Name: 'ISUZU',
+    },
+    {
+      Name: 'GREAT WALL',
+    },
+    {
+      Name: 'DAIHATSU',
+    },
   ],
 };

@@ -20,6 +20,22 @@ const marquesWithRecall = {
     last_update: '19022015',
     delay: 0,
   },
+  ISUZU: {
+    status: 201,
+    status_description: 'Recall Outstanding',
+    vin: '',
+    vin_recall_status: 'BRAKES',
+    last_update: '19022015',
+    delay: 0,
+  },
+  SUBARU: {
+    status: 201,
+    status_description: 'Recall Outstanding',
+    vin: '',
+    vin_recall_status: 'BRAKES',
+    last_update: '19022015',
+    delay: 0,
+  },
   BMW: {
     status: 200,
     status_description: 'No Recall Outstanding',
@@ -51,6 +67,22 @@ const marquesWithRecall = {
     vin_recall_status: '',
     last_update: '19022015',
     delay: 3000,
+  },
+  DAIHATSU: {
+    status: 200,
+    status_description: 'No Recall Outstanding',
+    vin: '',
+    vin_recall_status: '',
+    last_update: '19022015',
+    delay: 3000,
+  },
+  'GREAT WALL': {
+    status: 200,
+    status_description: 'No Recall Outstanding',
+    vin: '',
+    vin_recall_status: '',
+    last_update: '19022015',
+    delay: 0,
   },
 };
 
